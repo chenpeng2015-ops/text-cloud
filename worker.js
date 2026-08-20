@@ -13,7 +13,6 @@ export default {
       return new Response(null, { headers: corsHeaders });
     }
 
-    // 🔒 设置您的管理密码（请将 admin123456 改为您自己的密码）
     const ADMIN_PASSWORD = env.ADMIN_PASSWORD || "2015";
 
     try {
@@ -40,10 +39,9 @@ export default {
         });
       }
 
-      // ----------------- 以下接口需要密码校验 -----------------
+      // 密码拦截
       const clientPassword = request.headers.get("X-Admin-Password");
-      
-      // 2. 验证密码接口
+
       if (path === "/api/auth/verify" && request.method === "POST") {
         if (clientPassword === ADMIN_PASSWORD) {
           return Response.json({ success: true }, { headers: corsHeaders });
@@ -52,12 +50,11 @@ export default {
         }
       }
 
-      // 密码拦截：除公开接口外，其余 API 必须携带正确密码
       if (clientPassword !== ADMIN_PASSWORD) {
-        return Response.json({ error: "Unauthorized: 密码不正确" }, { status: 401, headers: corsHeaders });
+        return Response.json({ error: "Unauthorized" }, { status: 401, headers: corsHeaders });
       }
 
-      // 3. 获取节点列表（文件和文件夹）
+      // 获取列表
       if (path === "/api/files" && request.method === "GET") {
         const list = await env.MY_R2.list({ prefix: "meta/" });
         const items = [];
@@ -68,10 +65,9 @@ export default {
         return Response.json(items, { headers: corsHeaders });
       }
 
-      // 4. 保存/更新 节点
+      // 保存 / 更新
       if (path === "/api/files/save" && request.method === "POST") {
         const data = await request.json();
-        
         const metaData = { 
           id: data.id, 
           name: data.name, 
@@ -81,8 +77,8 @@ export default {
         };
         await env.MY_R2.put(`meta/${data.id}.json`, JSON.stringify(metaData));
 
-        if (data.type === 'file') {
-          await env.MY_R2.put(`files/${data.id}`, data.content || "");
+        if (data.type === 'file' && data.content !== undefined) {
+          await env.MY_R2.put(`files/${data.id}`, data.content);
         }
 
         if (data.token && data.type === 'file') {
@@ -95,7 +91,7 @@ export default {
         return Response.json({ success: true }, { headers: corsHeaders });
       }
 
-      // 5. 删除节点
+      // 删除
       if (path.startsWith("/api/files/") && request.method === "DELETE") {
         const id = path.replace("/api/files/", "");
         await env.MY_R2.delete(`meta/${id}.json`);

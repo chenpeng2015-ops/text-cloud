@@ -3,8 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>文本云盘</title>
+  <title>文本云盘 - 管理系统</title>
   <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
+  <!-- 引入配置文件 -->
+  <script src="./config.js"></script>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -39,12 +41,11 @@
     .editor-container { display: none; flex-direction: column; height: 100%; padding: 16px 24px; gap: 8px; position: relative; }
     .top-bar { display: flex; justify-content: space-between; align-items: center; padding-bottom: 8px; border-bottom: 1px solid #f1f5f9; }
     
-    /* 保存状态标签与保存按钮 */
     .save-status { font-size: 12px; color: #10b981; font-weight: 500; display: flex; align-items: center; gap: 4px; }
     .save-status.unsaved { color: #f59e0b; }
     .save-status.saving { color: #3b82f6; }
     
-    .save-btn { padding: 4px 12px; border-radius: 4px; border: none; background: #10b981; color: #fff; cursor: pointer; font-size: 12px; font-weight: 500; display: flex; align-items: center; gap: 4px; }
+    .save-btn { padding: 5px 14px; border-radius: 6px; border: none; background: #10b981; color: #fff; cursor: pointer; font-size: 12px; font-weight: 600; display: flex; align-items: center; gap: 4px; }
     .save-btn:hover { background: #059669; }
 
     .controls-group { display: flex; align-items: center; gap: 12px; font-size: 12px; color: #64748b; }
@@ -59,10 +60,7 @@
     .font-serif { font-family: "Georgia", serif; }
     .stats-bar { text-align: right; font-size: 12px; color: #94a3b8; padding-top: 2px; }
 
-    .share-section {
-      background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px;
-      padding: 12px 16px; margin-top: 8px; transition: all 0.3s ease;
-    }
+    .share-section { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px 16px; margin-top: 8px; transition: all 0.3s ease; }
     .share-toggle-header { display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
     .share-header { font-size: 13px; font-weight: 600; color: #334155; display: flex; align-items: center; gap: 6px; }
     .share-body { display: none; margin-top: 12px; }
@@ -93,13 +91,7 @@
     .symbol-item { display: flex; justify-content: center; align-items: center; height: 38px; font-size: 18px; background: #fff; border: 1px solid #cbd5e1; border-radius: 6px; cursor: pointer; }
     .symbol-item:hover { background: #eff6ff; border-color: #2563eb; }
 
-    .toast-undo {
-      position: absolute; bottom: 20px; right: 20px; z-index: 1000;
-      background: #0f172a; color: #fff; padding: 12px 18px; border-radius: 8px;
-      box-shadow: 0 10px 15px -3px rgba(0,0,0,0.3); font-size: 13px;
-      display: flex; align-items: center; gap: 12px;
-      animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-    }
+    .toast-undo { position: absolute; bottom: 20px; right: 20px; z-index: 1000; background: #0f172a; color: #fff; padding: 12px 18px; border-radius: 8px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.3); font-size: 13px; display: flex; align-items: center; gap: 12px; animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
     .undo-btn { background: #3b82f6; color: #fff; border: none; padding: 4px 10px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: 600; }
     .undo-btn:hover { background: #2563eb; }
     @keyframes slideUp { from { transform: translateY(100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
@@ -107,12 +99,12 @@
 </head>
 <body>
 
-  <!-- 登录遮罩 -->
+  <!-- 登录弹窗 -->
   <div class="login-mask" id="loginMask">
     <div class="login-card">
-      <div class="login-title">🔐 密码身份验证</div>
+      <div class="login-title">🔐 管理员验证</div>
       <div class="form-group">
-        <label class="form-label">管理密码</label>
+        <label class="form-label">控制台密码</label>
         <input type="password" id="passwordInput" class="login-input" placeholder="请输入密码" onkeyup="if(event.key==='Enter') login()">
       </div>
       <div class="form-group">
@@ -127,7 +119,7 @@
     </div>
   </div>
 
-  <!-- 移动文件夹弹窗 -->
+  <!-- 移动位置弹窗 -->
   <div class="modal-mask" id="moveModal" style="display: none;">
     <div class="modal-card">
       <div class="modal-title">📂 选择目标文件夹</div>
@@ -190,7 +182,6 @@
       <div class="editor-container" id="editorContainer">
         <div class="top-bar">
           <div style="display: flex; align-items: center; gap: 12px;">
-            <!-- 🌟 显式保存按钮 -->
             <button class="save-btn" onclick="manualSave()">💾 保存 (Ctrl+S)</button>
             <div class="save-status" id="saveStatus">✓ 已保存</div>
           </div>
@@ -205,7 +196,7 @@
             
             <span>字号:</span>
             <button class="font-btn" onclick="changeFontSize(-1)">-</button>
-            <span id="fontSizeDisplay">20</span>
+            <span id="fontSizeDisplay">14</span>
             <button class="font-btn" onclick="changeFontSize(1)">+</button>
           </div>
         </div>
@@ -256,18 +247,16 @@
   <div id="toastContainer"></div>
 
   <script>
-    const API_BASE = "https://text-cloud-api.chenpeng2015.workers.dev"; // ⚠️ 替换为您的 Worker 实际域名
-
     let items = [];
     let activeItemId = null;
     let movingTargetId = null;
     let selectedParentFolderId = null;
     let openFolderIds = new Set();
-    let currentFontSize = 14;
+    let currentFontSize = CONFIG.EDITOR_DEFAULT.FONT_SIZE;
     let lastDeletedBatch = null;
     let undoTimer = null;
     let currentFetchController = null;
-    let isDirty = false; // 标记是否有未保存更改
+    let isDirty = false;
 
     const SYMBOL_SETS = {
       gesture: ["👍", "👎", "👌", "✌️", "🤞", "🤟", "🤘", "🤙", "👈", "👉", "👆", "👇", "✋", "🤚", "🖐️", "🖖", "👋", "👏", "🙌", "👐", "🤲", "🤝", "🙏", "✍️"],
@@ -296,7 +285,7 @@
       const pwd = getStoredPassword();
       if (!pwd) {
         document.getElementById('loginMask').style.display = 'flex';
-        throw new Error('未登录或登录超时');
+        throw new Error('未登录');
       }
 
       const headers = {
@@ -308,11 +297,11 @@
         headers['Content-Type'] = 'application/json';
       }
 
-      const res = await fetch(`${API_BASE}${endpoint}`, { ...options, headers });
+      const res = await fetch(`${CONFIG.API_BASE}${endpoint}`, { ...options, headers });
       if (res.status === 401) {
         localStorage.removeItem('admin_auth');
         document.getElementById('loginMask').style.display = 'flex';
-        throw new Error('密码错误');
+        throw new Error('鉴权失效');
       }
       return res;
     }
@@ -323,21 +312,20 @@
       if (!pwd) return alert('请输入密码');
 
       try {
-        const res = await fetch(`${API_BASE}/api/auth/verify`, {
+        const res = await fetch(`${CONFIG.API_BASE}/api/auth/verify`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'X-Admin-Password': pwd }
         });
 
         if (res.ok) {
-          const authData = { pwd, expire: Date.now() + keepAliveMs };
-          localStorage.setItem('admin_auth', JSON.stringify(authData));
+          localStorage.setItem('admin_auth', JSON.stringify({ pwd, expire: Date.now() + keepAliveMs }));
           document.getElementById('loginMask').style.display = 'none';
           fetchItems();
         } else {
-          alert('密码错误！');
+          alert('密码验证失败！');
         }
       } catch (e) {
-        alert('登录失败: ' + e.message);
+        alert('登录出错: ' + e.message);
       }
     }
 
@@ -352,7 +340,7 @@
         items = await res.json();
         renderTree();
       } catch (err) {
-        console.error("无法加载文件", err);
+        console.error("加载文件列表失败", err);
       }
     }
 
@@ -445,19 +433,14 @@
       document.querySelectorAll('.dropdown-menu').forEach(m => m.style.display = 'none');
     }
 
-    // 🌟 文件切换：离场自动保存 + 取消积压请求 + 优先缓存渲染
     async function selectFile(id) {
       if (activeItemId === id) return;
 
-      // 1. 离场/切换时，如果内容有修改，静默保存上一个文件
       if (activeItemId && isDirty) {
         await flushSaveCurrentFile();
       }
 
-      // 2. 中断未完成的网络请求，防卡顿
-      if (currentFetchController) {
-        currentFetchController.abort();
-      }
+      if (currentFetchController) currentFetchController.abort();
       currentFetchController = new AbortController();
 
       activeItemId = id;
@@ -472,7 +455,6 @@
       closeShareSection();
       const editor = document.getElementById('textEditor');
 
-      // 3. 优先渲染本地/内存缓存
       if (typeof file._content !== 'undefined' && file._content !== null) {
         editor.value = file._content;
         updateStats();
@@ -491,9 +473,8 @@
         return;
       }
 
-      // 4. 后台拉取最新数据
       try {
-        const res = await fetch(`${API_BASE}/sub/${file.token}/${encodeURIComponent(file.name)}?t=${Date.now()}`, {
+        const res = await fetch(`${CONFIG.API_BASE}/sub/${file.token}/${encodeURIComponent(file.name)}?t=${Date.now()}`, {
           signal: currentFetchController.signal
         });
 
@@ -508,12 +489,11 @@
         }
       } catch (e) {
         if (e.name !== 'AbortError') {
-          console.error('拉取数据失败:', e);
+          console.error('获取文件失败:', e);
         }
       }
     }
 
-    // 🌟 状态更新控制
     function setSaveStatus(status) {
       const statusEl = document.getElementById('saveStatus');
       if (!statusEl) return;
@@ -534,11 +514,7 @@
 
     function toggleShareSection() {
       const body = document.getElementById('shareBody');
-      if (body.style.display === 'block') {
-        closeShareSection();
-      } else {
-        openShareSection();
-      }
+      body.style.display === 'block' ? closeShareSection() : openShareSection();
     }
 
     function openShareSection() {
@@ -639,7 +615,7 @@
       container.innerHTML = `
         <div class="toast-undo" id="undoToast">
           <span>已删除 "${itemName}"</span>
-          <button class="undo-btn" onclick="undoDelete()">撤销 (返回)</button>
+          <button class="undo-btn" onclick="undoDelete()">撤销恢复</button>
         </div>
       `;
 
@@ -666,17 +642,13 @@
         if (item.type === 'file' && item.token) {
           await apiFetch('/api/files/content', {
             method: 'POST',
-            body: JSON.stringify({
-              id: item.id,
-              token: item.token,
-              content: item._content || ''
-            })
+            body: JSON.stringify({ id: item.id, token: item.token, content: item._content || '' })
           });
         }
       }
 
       renderTree();
-      alert('已成功恢复删除的内容！');
+      alert('还原成功！');
     }
 
     function openMoveModal(e, id) {
@@ -738,16 +710,11 @@
     function renderSymbols(category) {
       const grid = document.getElementById('symbolGrid');
       grid.innerHTML = '';
-      const symbols = SYMBOL_SETS[category] || [];
-
-      symbols.forEach(sym => {
+      (SYMBOL_SETS[category] || []).forEach(sym => {
         const btn = document.createElement('div');
         btn.className = 'symbol-item';
         btn.textContent = sym;
-        btn.onclick = () => {
-          insertAtCursor(sym);
-          closeSymbolModal();
-        };
+        btn.onclick = () => { insertAtCursor(sym); closeSymbolModal(); };
         grid.appendChild(btn);
       });
     }
@@ -759,9 +726,7 @@
       
       const file = items.find(i => i.id === id);
       openShareSection();
-      if (file && file.token) {
-        showShareResult(file.token);
-      }
+      if (file && file.token) showShareResult(file.token);
     }
 
     function insertAtCursor(text) {
@@ -780,27 +745,20 @@
     }
 
     function handlePasteEvent() {
-      setTimeout(() => {
-        handleEditorInput();
-      }, 50);
+      setTimeout(() => handleEditorInput(), 50);
     }
 
-    // 🌟 打字时仅更改状态，无网络交互，流畅零延迟
     function handleEditorInput() {
       updateStats();
       const file = items.find(i => i.id === activeItemId);
-      if (file) {
-        file._content = document.getElementById('textEditor').value;
-      }
+      if (file) file._content = document.getElementById('textEditor').value;
       setSaveStatus('unsaved');
     }
 
-    // 手动点击保存按钮
     async function manualSave() {
       await flushSaveCurrentFile();
     }
 
-    // 🌟 执行保存核心逻辑
     async function flushSaveCurrentFile() {
       if (!activeItemId) return;
 
@@ -811,21 +769,14 @@
       const content = document.getElementById('textEditor').value;
       file._content = content;
 
-      if (!file.token) {
-        file.token = crypto.randomUUID();
-      }
+      if (!file.token) file.token = crypto.randomUUID();
 
       try {
         await saveItemToBackend(file);
         await apiFetch('/api/files/content', {
           method: 'POST',
-          body: JSON.stringify({
-            id: file.id,
-            token: file.token,
-            content: content
-          })
+          body: JSON.stringify({ id: file.id, token: file.token, content: content })
         });
-
         setSaveStatus('saved');
       } catch (e) {
         console.error("保存失败:", e);
@@ -859,7 +810,7 @@
 
     function showShareResult(token) {
       const file = items.find(i => i.id === activeItemId);
-      const shareUrl = `${API_BASE}/sub/${token}/${encodeURIComponent(file.name)}`;
+      const shareUrl = `${CONFIG.API_BASE}/sub/${token}/${encodeURIComponent(file.name)}`;
       document.getElementById('shareUrlInput').value = shareUrl;
       document.getElementById('shareResult').style.display = 'block';
 
@@ -885,11 +836,10 @@
     }
 
     function changeFontFamily(fontClass) {
-      const editor = document.getElementById('textEditor');
-      editor.className = `editor-textarea ${fontClass}`;
+      document.getElementById('textEditor').className = `editor-textarea ${fontClass}`;
     }
 
-    // 🌟 全局绑定的保存快捷键 Ctrl+S / Cmd+S
+    // 全局快捷键 Ctrl+S / Cmd+S
     window.addEventListener('keydown', function(e) {
       if ((e.ctrlKey || e.metaKey) && e.key === 's') {
         e.preventDefault();
@@ -897,7 +847,7 @@
       }
     });
 
-    // 🌟 离开/关闭页面前，如果有更改，触发浏览器默认防丢提示
+    // 页面关闭前的状态保护
     window.addEventListener('beforeunload', function (e) {
       if (isDirty) {
         e.preventDefault();

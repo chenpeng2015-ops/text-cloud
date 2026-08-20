@@ -31,7 +31,6 @@
     
     .main-container { flex: 1; display: flex; overflow: hidden; }
     
-    /* 侧边栏 */
     .sidebar { width: 280px; background: #fff; border-right: 1px solid #e2e8f0; display: flex; flex-direction: column; }
     .sidebar-header { padding: 12px; display: flex; justify-content: space-between; align-items: center; }
     .sidebar-title { font-size: 13px; font-weight: 600; color: #475569; }
@@ -45,7 +44,6 @@
     .search-box { padding: 0 12px 10px; }
     .search-input { width: 100%; padding: 6px 10px; font-size: 12px; border: 1px solid #cbd5e1; border-radius: 4px; outline: none; }
     
-    /* 树状菜单 */
     .file-tree { flex: 1; overflow-y: auto; padding: 4px; user-select: none; }
     .tree-node-wrapper { position: relative; }
     .tree-node {
@@ -77,7 +75,6 @@
     .dropdown-item:hover { background: #f8fafc; color: #2563eb; }
     .dropdown-item.danger:hover { background: #fef2f2; color: #ef4444; }
 
-    /* 编辑器工作区 */
     .content-area { flex: 1; display: flex; flex-direction: column; background: #fff; overflow-y: auto; }
     .editor-container { display: none; flex-direction: column; height: 100%; padding: 16px 24px; gap: 8px; }
     
@@ -89,7 +86,6 @@
     .select-control { padding: 3px 6px; font-size: 12px; border: 1px solid #cbd5e1; border-radius: 4px; outline: none; background: #fff; }
     .font-btn { padding: 2px 8px; border: 1px solid #cbd5e1; background: #fff; border-radius: 4px; cursor: pointer; }
 
-    /* 快捷工具栏 */
     .toolbar-bar {
       display: flex; align-items: center; gap: 8px; background: #f8fafc; border: 1px solid #e2e8f0;
       border-bottom: none; border-top-left-radius: 8px; border-top-right-radius: 8px; padding: 6px 12px; flex-wrap: wrap;
@@ -100,7 +96,6 @@
     }
     .toolbar-btn:hover { background: #f1f5f9; color: #2563eb; }
 
-    /* 编辑器 */
     .editor-textarea {
       flex: 1; width: 100%; min-height: 320px; padding: 16px; border: 1px solid #e2e8f0;
       border-bottom-left-radius: 8px; border-bottom-right-radius: 8px; outline: none; font-size: 14px; line-height: 1.7;
@@ -136,7 +131,6 @@
 
     .empty-state { margin: auto; text-align: center; color: #64748b; }
 
-    /* 模态弹窗与密码框风格 */
     .login-mask, .modal-mask {
       position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
       background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px);
@@ -154,7 +148,6 @@
     }
     .login-btn { width: 100%; padding: 10px; background: #2563eb; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 500; font-size: 14px; margin-top: 8px; }
 
-    /* 可视化移动文件夹树布局 */
     .move-folder-tree {
       max-height: 260px; overflow-y: auto; border: 1px solid #e2e8f0;
       border-radius: 6px; padding: 6px; margin-bottom: 16px; background: #f8fafc;
@@ -167,7 +160,6 @@
     .modal-actions { display: flex; justify-content: flex-end; gap: 8px; }
     .btn-secondary { background: #e2e8f0; color: #475569; border: none; padding: 6px 14px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: 500; }
 
-    /* 特殊符号网格网面板 */
     .symbol-grid {
       display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px;
       max-height: 240px; overflow-y: auto; border: 1px solid #e2e8f0;
@@ -204,7 +196,7 @@
     </div>
   </div>
 
-  <!-- 可视化移动文件夹弹窗 -->
+  <!-- 移动文件夹弹窗 -->
   <div class="modal-mask" id="moveModal" style="display: none;">
     <div class="modal-card">
       <div class="modal-title">📂 选择目标文件夹</div>
@@ -277,7 +269,7 @@
             
             <span>字号:</span>
             <button class="font-btn" onclick="changeFontSize(-1)">-</button>
-            <span id="fontSizeDisplay">20</span>
+            <span id="fontSizeDisplay">14</span>
             <button class="font-btn" onclick="changeFontSize(1)">+</button>
           </div>
         </div>
@@ -296,7 +288,8 @@
           <button class="toolbar-btn" onclick="openSymbolModal()">✨ 插入特殊符号</button>
         </div>
 
-        <textarea id="textEditor" class="editor-textarea font-mono" oninput="handleEditorInput()"></textarea>
+        <!-- 增加 onpaste 与 onblur 事件确保粘贴和切出时 100% 保存 -->
+        <textarea id="textEditor" class="editor-textarea font-mono" oninput="handleEditorInput()" onpaste="handlePasteEvent()" onblur="flushSaveCurrentFile()"></textarea>
         <div class="stats-bar" id="statsBar">0 字 · 0 行</div>
 
         <div class="share-section">
@@ -331,7 +324,6 @@
     let currentFontSize = 14;
     let autoSaveTimer = null;
 
-    // 特殊符号词库配置
     const SYMBOL_SETS = {
       gesture: ["👍", "👎", "👌", "✌️", "🤞", "🤟", "🤘", "🤙", "👈", "👉", "👆", "👇", "✋", "🤚", "🖐️", "🖖", "👋", "👏", "🙌", "👐", "🤲", "🤝", "🙏", "✍️"],
       flag: ["🚩", "🏳️", "🏴", "🏁", "🎌", "🏳️‍🌈", "🏴‍☠️", "🇨🇳", "🇺🇸", "🇯🇵", "🇬🇧", "🇫🇷", "🇩🇪", "🇷🇺", "🇰🇷", "🇮🇳"],
@@ -480,7 +472,7 @@
       `;
       menu.innerHTML = menuContent;
 
-      el.onclick = (e) => {
+      el.onclick = async (e) => {
         e.stopPropagation();
         closeAllDropdowns();
         if (isFolder) {
@@ -488,7 +480,7 @@
           selectedParentFolderId = item.id;
           renderTree();
         } else {
-          selectFile(item.id);
+          await selectFile(item.id);
         }
       };
 
@@ -509,6 +501,11 @@
     }
 
     async function selectFile(id) {
+      if (activeItemId === id) return;
+
+      // 🌟【关键修复】：切换文件前，先强制保存当前正在编辑的文档
+      await flushSaveCurrentFile();
+
       activeItemId = id;
       const file = items.find(i => i.id === id);
       if (!file) return;
@@ -531,6 +528,8 @@
     }
 
     async function createNewItem(type) {
+      await flushSaveCurrentFile(); // 强制保存当前
+
       const label = type === 'folder' ? '文件夹' : '文件';
       const name = prompt(`请输入${label}名称:`, `新建${label}`);
       if (!name) return;
@@ -543,7 +542,7 @@
         openFolderIds.add(newItem.id);
         renderTree();
       } else {
-        selectFile(newItem.id);
+        await selectFile(newItem.id);
       }
     }
 
@@ -561,7 +560,6 @@
       }
     }
 
-    /* 移动文件夹逻辑 */
     function openMoveModal(e, id) {
       e.stopPropagation();
       closeAllDropdowns();
@@ -608,7 +606,6 @@
       closeMoveModal();
     }
 
-    /* 符号选择面板逻辑 */
     function openSymbolModal() {
       renderSymbols('gesture');
       document.getElementById('symbolCategorySelect').value = 'gesture';
@@ -689,6 +686,13 @@
       if (emoji) insertAtCursor(emoji);
     }
 
+    // 🌟【关键修复】：专门处理粘贴事件
+    function handlePasteEvent() {
+      setTimeout(() => {
+        handleEditorInput();
+      }, 50);
+    }
+
     function handleEditorInput() {
       updateStats();
       const statusEl = document.getElementById('saveStatus');
@@ -697,17 +701,34 @@
 
       clearTimeout(autoSaveTimer);
       autoSaveTimer = setTimeout(async () => {
-        await saveCurrentFileSilently();
-        statusEl.textContent = '✓ 已自动保存';
-        statusEl.className = 'save-status';
-      }, 1000);
+        await flushSaveCurrentFile();
+      }, 800);
     }
 
-    async function saveCurrentFileSilently() {
+    // 🌟【关键修复】：立即保存当前编辑器的内容，不经过定时器延迟
+    async function flushSaveCurrentFile() {
+      if (!activeItemId) return;
+      clearTimeout(autoSaveTimer);
+
       const file = items.find(i => i.id === activeItemId);
       if (!file) return;
-      file.content = document.getElementById('textEditor').value;
-      await saveItemToBackend(file);
+
+      const currentText = document.getElementById('textEditor').value;
+      file.content = currentText;
+
+      const statusEl = document.getElementById('saveStatus');
+      try {
+        await saveItemToBackend(file);
+        if (statusEl) {
+          statusEl.textContent = '✓ 已自动保存';
+          statusEl.className = 'save-status';
+        }
+      } catch (e) {
+        if (statusEl) {
+          statusEl.textContent = '❌ 保存失败';
+          statusEl.className = 'save-status saving';
+        }
+      }
     }
 
     async function saveItemToBackend(item) {

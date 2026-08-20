@@ -3,7 +3,7 @@
  */
 const CONFIG = {
   // Cloudflare Worker 后端 API 根地址 (部署后替换为你的 Worker 域名)
-  API_BASE: "https://worker.dpzc.ccwu.cc",
+  API_BASE: "https://text-cloud-api.chenpeng2015.workers.dev",
   
   // 密码登录状态保持时长选项 (单位: 毫秒)
   KEEP_ALIVE_OPTIONS: {

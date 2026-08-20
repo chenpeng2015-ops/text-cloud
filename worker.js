@@ -14,7 +14,7 @@ export default {
     }
 
     // 🔒 设置您的管理密码（请将 admin123456 改为您自己的密码）
-    const ADMIN_PASSWORD = env.ADMIN_PASSWORD || "admin123456";
+    const ADMIN_PASSWORD = env.ADMIN_PASSWORD || "2015";
 
     try {
       // 1. 公开访问接口：读取分享文件（免密码）

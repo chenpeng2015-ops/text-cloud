@@ -12,7 +12,7 @@
       background-color: #f8fafc; color: #1e293b; height: 100vh; display: flex; flex-direction: column; overflow: hidden;
     }
     .navbar { height: 48px; background: #fff; border-bottom: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; font-weight: 600; font-size: 14px; }
-    .main-container { flex: 1; display: flex; overflow: hidden; }
+    .main-container { flex: 1; display: flex; overflow: hidden; position: relative; }
     .sidebar { width: 280px; background: #fff; border-right: 1px solid #e2e8f0; display: flex; flex-direction: column; }
     .sidebar-header { padding: 12px; display: flex; justify-content: space-between; align-items: center; }
     .sidebar-title { font-size: 13px; font-weight: 600; color: #475569; }
@@ -35,25 +35,38 @@
     .dropdown-item { padding: 6px 12px; font-size: 12px; color: #334155; cursor: pointer; display: flex; align-items: center; justify-content: space-between; }
     .dropdown-item:hover { background: #f8fafc; color: #2563eb; }
     .dropdown-item.danger:hover { background: #fef2f2; color: #ef4444; }
-    .content-area { flex: 1; display: flex; flex-direction: column; background: #fff; overflow-y: auto; }
-    .editor-container { display: none; flex-direction: column; height: 100%; padding: 16px 24px; gap: 8px; }
+    .content-area { flex: 1; display: flex; flex-direction: column; background: #fff; overflow-y: auto; position: relative; }
+    .editor-container { display: none; flex-direction: column; height: 100%; padding: 16px 24px; gap: 8px; position: relative; }
     .top-bar { display: flex; justify-content: space-between; align-items: center; padding-bottom: 8px; border-bottom: 1px solid #f1f5f9; }
+    
+    /* 保存状态标签与保存按钮 */
     .save-status { font-size: 12px; color: #10b981; font-weight: 500; display: flex; align-items: center; gap: 4px; }
-    .save-status.saving { color: #f59e0b; }
+    .save-status.unsaved { color: #f59e0b; }
+    .save-status.saving { color: #3b82f6; }
+    
+    .save-btn { padding: 4px 12px; border-radius: 4px; border: none; background: #10b981; color: #fff; cursor: pointer; font-size: 12px; font-weight: 500; display: flex; align-items: center; gap: 4px; }
+    .save-btn:hover { background: #059669; }
+
     .controls-group { display: flex; align-items: center; gap: 12px; font-size: 12px; color: #64748b; }
     .select-control { padding: 3px 6px; font-size: 12px; border: 1px solid #cbd5e1; border-radius: 4px; outline: none; background: #fff; }
     .font-btn { padding: 2px 8px; border: 1px solid #cbd5e1; background: #fff; border-radius: 4px; cursor: pointer; }
     .toolbar-bar { display: flex; align-items: center; gap: 8px; background: #f8fafc; border: 1px solid #e2e8f0; border-bottom: none; border-top-left-radius: 8px; border-top-right-radius: 8px; padding: 6px 12px; flex-wrap: wrap; }
     .toolbar-btn { padding: 4px 8px; border: 1px solid #cbd5e1; background: #fff; border-radius: 4px; cursor: pointer; font-size: 12px; color: #334155; display: flex; align-items: center; gap: 4px; }
-    .editor-textarea { flex: 1; width: 100%; min-height: 320px; padding: 16px; border: 1px solid #e2e8f0; border-bottom-left-radius: 8px; border-bottom-right-radius: 8px; outline: none; font-size: 14px; line-height: 1.7; resize: none; background: #fafafa; color: #0f172a; }
+    .editor-textarea { flex: 1; width: 100%; min-height: 280px; padding: 16px; border: 1px solid #e2e8f0; border-bottom-left-radius: 8px; border-bottom-right-radius: 8px; outline: none; font-size: 14px; line-height: 1.7; resize: none; background: #fafafa; color: #0f172a; }
     .editor-textarea:focus { border-color: #3b82f6; background: #fff; }
     .font-mono { font-family: "Consolas", "Fira Code", monospace; }
     .font-sans { font-family: -apple-system, BlinkMacSystemFont, sans-serif; }
     .font-serif { font-family: "Georgia", serif; }
     .stats-bar { text-align: right; font-size: 12px; color: #94a3b8; padding-top: 2px; }
-    .share-section { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px; margin-top: 8px; }
-    .share-header { font-size: 13px; font-weight: 600; color: #334155; margin-bottom: 6px; }
-    .share-tips { font-size: 11px; color: #94a3b8; margin-bottom: 12px; }
+
+    .share-section {
+      background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px;
+      padding: 12px 16px; margin-top: 8px; transition: all 0.3s ease;
+    }
+    .share-toggle-header { display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
+    .share-header { font-size: 13px; font-weight: 600; color: #334155; display: flex; align-items: center; gap: 6px; }
+    .share-body { display: none; margin-top: 12px; }
+    .share-tips { font-size: 11px; color: #94a3b8; margin-bottom: 10px; }
     .token-row { display: flex; gap: 8px; }
     .token-input { flex: 1; padding: 6px 10px; font-size: 12px; border: 1px solid #cbd5e1; border-radius: 4px; outline: none; }
     .btn-action { background: #2563eb; color: #fff; border: none; padding: 6px 14px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: 500; }
@@ -62,6 +75,7 @@
     .result-title { font-size: 12px; color: #166534; font-weight: 600; margin-bottom: 8px; }
     .link-input { width: 100%; padding: 8px; font-size: 12px; border: 1px solid #86efac; border-radius: 4px; color: #15803d; background: #fff; font-family: monospace; }
     .qr-container { margin-top: 12px; display: flex; justify-content: center; }
+
     .empty-state { margin: auto; text-align: center; color: #64748b; }
     .login-mask, .modal-mask { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); display: flex; justify-content: center; align-items: center; z-index: 999; }
     .login-card, .modal-card { background: #fff; padding: 24px; border-radius: 12px; width: 380px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); }
@@ -78,6 +92,17 @@
     .symbol-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; max-height: 240px; overflow-y: auto; border: 1px solid #e2e8f0; padding: 10px; border-radius: 6px; background: #f8fafc; margin-bottom: 14px; }
     .symbol-item { display: flex; justify-content: center; align-items: center; height: 38px; font-size: 18px; background: #fff; border: 1px solid #cbd5e1; border-radius: 6px; cursor: pointer; }
     .symbol-item:hover { background: #eff6ff; border-color: #2563eb; }
+
+    .toast-undo {
+      position: absolute; bottom: 20px; right: 20px; z-index: 1000;
+      background: #0f172a; color: #fff; padding: 12px 18px; border-radius: 8px;
+      box-shadow: 0 10px 15px -3px rgba(0,0,0,0.3); font-size: 13px;
+      display: flex; align-items: center; gap: 12px;
+      animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .undo-btn { background: #3b82f6; color: #fff; border: none; padding: 4px 10px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: 600; }
+    .undo-btn:hover { background: #2563eb; }
+    @keyframes slideUp { from { transform: translateY(100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
   </style>
 </head>
 <body>
@@ -153,7 +178,7 @@
       <div class="file-tree" id="fileTree" onclick="closeAllDropdowns()"></div>
     </div>
 
-    <div class="content-area">
+    <div class="content-area" id="contentArea">
       <div class="empty-state" id="emptyState">
         <p style="font-size:16px; font-weight:600; margin-bottom:12px; color:#475569;">选择或新建文件开始编辑</p>
         <div style="display:flex; gap:10px; justify-content:center;">
@@ -164,7 +189,12 @@
 
       <div class="editor-container" id="editorContainer">
         <div class="top-bar">
-          <div class="save-status" id="saveStatus">✓ 已自动保存</div>
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <!-- 🌟 显式保存按钮 -->
+            <button class="save-btn" onclick="manualSave()">💾 保存 (Ctrl+S)</button>
+            <div class="save-status" id="saveStatus">✓ 已保存</div>
+          </div>
+
           <div class="controls-group">
             <span>字体:</span>
             <select id="fontSelect" class="select-control" onchange="changeFontFamily(this.value)">
@@ -175,7 +205,7 @@
             
             <span>字号:</span>
             <button class="font-btn" onclick="changeFontSize(-1)">-</button>
-            <span id="fontSizeDisplay">20</span>
+            <span id="fontSizeDisplay">14</span>
             <button class="font-btn" onclick="changeFontSize(1)">+</button>
           </div>
         </div>
@@ -197,26 +227,33 @@
         <textarea id="textEditor" class="editor-textarea font-mono" oninput="handleEditorInput()" onpaste="handlePasteEvent()"></textarea>
         <div class="stats-bar" id="statsBar">0 字 · 0 行</div>
 
-        <div class="share-section">
-          <div class="share-header">🔑 分享设置</div>
-          <div class="share-tips">自定义 Token 替代公开 URL，可随时重新生成使旧链接失效。</div>
-          
-          <div class="token-row">
-            <input type="text" id="tokenInput" class="token-input" placeholder="自定义 Token（留空自动生成）">
-            <button class="btn-action" onclick="generateShareLink()">生成 / 更新链接</button>
+        <div class="share-section" id="shareSection">
+          <div class="share-toggle-header" onclick="toggleShareSection()">
+            <div class="share-header">🔑 分享与订阅设置</div>
+            <span id="shareArrow" style="font-size: 12px; color: #64748b;">▲ 点击展开</span>
           </div>
+          
+          <div class="share-body" id="shareBody">
+            <div class="share-tips">自定义 Token 替代公开 URL，可随时重新生成使旧链接失效。</div>
+            <div class="token-row">
+              <input type="text" id="tokenInput" class="token-input" placeholder="自定义 Token（留空自动生成）">
+              <button class="btn-action" onclick="generateShareLink()">生成 / 更新链接</button>
+            </div>
 
-          <div class="share-result" id="shareResult">
-            <button class="close-share-btn" title="关闭" onclick="hideShareResult()">×</button>
-            <div class="result-title">✓ 订阅/纯文本分享链接</div>
-            <input type="text" id="shareUrlInput" class="link-input" readonly onclick="this.select(); document.execCommand('copy'); alert('链接已复制到剪贴板！');">
-            <div class="qr-container" id="qrcode"></div>
+            <div class="share-result" id="shareResult">
+              <button class="close-share-btn" title="关闭" onclick="hideShareResult()">×</button>
+              <div class="result-title">✓ 订阅/纯文本分享链接</div>
+              <input type="text" id="shareUrlInput" class="link-input" readonly onclick="this.select(); document.execCommand('copy'); alert('链接已复制到剪贴板！');">
+              <div class="qr-container" id="qrcode"></div>
+            </div>
           </div>
         </div>
 
       </div>
     </div>
   </div>
+
+  <div id="toastContainer"></div>
 
   <script>
     const API_BASE = "https://text-cloud-api.chenpeng2015.workers.dev"; // ⚠️ 替换为您的 Worker 实际域名
@@ -227,8 +264,10 @@
     let selectedParentFolderId = null;
     let openFolderIds = new Set();
     let currentFontSize = 14;
-    let autoSaveTimer = null;
-    let isSaving = false;
+    let lastDeletedBatch = null;
+    let undoTimer = null;
+    let currentFetchController = null;
+    let isDirty = false; // 标记是否有未保存更改
 
     const SYMBOL_SETS = {
       gesture: ["👍", "👎", "👌", "✌️", "🤞", "🤟", "🤘", "🤙", "👈", "👉", "👆", "👇", "✋", "🤚", "🖐️", "🖖", "👋", "👏", "🙌", "👐", "🤲", "🤝", "🙏", "✍️"],
@@ -406,13 +445,20 @@
       document.querySelectorAll('.dropdown-menu').forEach(m => m.style.display = 'none');
     }
 
+    // 🌟 文件切换：离场自动保存 + 取消积压请求 + 优先缓存渲染
     async function selectFile(id) {
       if (activeItemId === id) return;
 
-      // 1. 切换文件前强制保存当前正在编辑的文档
-      if (activeItemId) {
+      // 1. 离场/切换时，如果内容有修改，静默保存上一个文件
+      if (activeItemId && isDirty) {
         await flushSaveCurrentFile();
       }
+
+      // 2. 中断未完成的网络请求，防卡顿
+      if (currentFetchController) {
+        currentFetchController.abort();
+      }
+      currentFetchController = new AbortController();
 
       activeItemId = id;
       const file = items.find(i => i.id === id);
@@ -423,37 +469,95 @@
       document.getElementById('editorContainer').style.display = 'flex';
       document.getElementById('tokenInput').value = file.token || '';
 
-      // 清空当前编辑器防止展示旧数据
-      document.getElementById('textEditor').value = "正在从云端加载文本...";
+      closeShareSection();
+      const editor = document.getElementById('textEditor');
 
-      // 如果有 content 缓存优先展示，否则发请求拉取
-      if (typeof file._content !== 'undefined') {
-        document.getElementById('textEditor').value = file._content;
-      } else if (file.token) {
-        try {
-          const res = await fetch(`${API_BASE}/sub/${file.token}/${encodeURIComponent(file.name)}?t=${Date.now()}`);
-          const text = res.ok ? await res.text() : '';
+      // 3. 优先渲染本地/内存缓存
+      if (typeof file._content !== 'undefined' && file._content !== null) {
+        editor.value = file._content;
+        updateStats();
+        setSaveStatus('saved');
+        renderTree();
+      } else {
+        editor.value = "正在加载...";
+        updateStats();
+        renderTree();
+      }
+
+      if (!file.token) {
+        if (editor.value === "正在加载...") editor.value = "";
+        file._content = editor.value;
+        setSaveStatus('saved');
+        return;
+      }
+
+      // 4. 后台拉取最新数据
+      try {
+        const res = await fetch(`${API_BASE}/sub/${file.token}/${encodeURIComponent(file.name)}?t=${Date.now()}`, {
+          signal: currentFetchController.signal
+        });
+
+        if (res.ok) {
+          const text = await res.text();
           file._content = text;
-          document.getElementById('textEditor').value = text;
-        } catch (e) {
-          document.getElementById('textEditor').value = '';
+          if (activeItemId === id) {
+            editor.value = text;
+            updateStats();
+            setSaveStatus('saved');
+          }
         }
-      } else {
-        document.getElementById('textEditor').value = '';
-        file._content = '';
+      } catch (e) {
+        if (e.name !== 'AbortError') {
+          console.error('拉取数据失败:', e);
+        }
       }
+    }
 
-      updateStats();
-      if (file.token) {
-        showShareResult(file.token);
-      } else {
-        hideShareResult();
+    // 🌟 状态更新控制
+    function setSaveStatus(status) {
+      const statusEl = document.getElementById('saveStatus');
+      if (!statusEl) return;
+      
+      if (status === 'saved') {
+        isDirty = false;
+        statusEl.textContent = '✓ 已保存';
+        statusEl.className = 'save-status';
+      } else if (status === 'unsaved') {
+        isDirty = true;
+        statusEl.textContent = '● 未保存';
+        statusEl.className = 'save-status unsaved';
+      } else if (status === 'saving') {
+        statusEl.textContent = '⏳ 保存中...';
+        statusEl.className = 'save-status saving';
       }
-      renderTree();
+    }
+
+    function toggleShareSection() {
+      const body = document.getElementById('shareBody');
+      if (body.style.display === 'block') {
+        closeShareSection();
+      } else {
+        openShareSection();
+      }
+    }
+
+    function openShareSection() {
+      document.getElementById('shareBody').style.display = 'block';
+      document.getElementById('shareArrow').textContent = '▼ 点击收起';
+      setTimeout(() => {
+        const contentArea = document.getElementById('contentArea');
+        contentArea.scrollTo({ top: contentArea.scrollHeight, behavior: 'smooth' });
+      }, 50);
+    }
+
+    function closeShareSection() {
+      document.getElementById('shareBody').style.display = 'none';
+      document.getElementById('shareArrow').textContent = '▲ 点击展开';
+      hideShareResult();
     }
 
     async function createNewItem(type) {
-      if (activeItemId) await flushSaveCurrentFile();
+      if (activeItemId && isDirty) await flushSaveCurrentFile();
 
       const label = type === 'folder' ? '文件夹' : '文件';
       const name = prompt(`请输入${label}名称:`, `新建${label}`);
@@ -485,6 +589,94 @@
         await saveItemToBackend(item);
         renderTree();
       }
+    }
+
+    async function deleteItem(e, id) {
+      e.stopPropagation();
+      closeAllDropdowns();
+      const target = items.find(i => i.id === id);
+      if (!target) return;
+
+      if (confirm(`确认删除 ${target.name} 吗？`)) {
+        const deletedItems = [];
+        const idsToDelete = [id];
+
+        if (target.type === 'folder') {
+          const findChildren = (pid) => {
+            items.filter(i => i.parentId === pid).forEach(child => {
+              idsToDelete.push(child.id);
+              if (child.type === 'folder') findChildren(child.id);
+            });
+          };
+          findChildren(id);
+        }
+
+        for (const delId of idsToDelete) {
+          const itemToDel = items.find(i => i.id === delId);
+          if (itemToDel) {
+            deletedItems.push(JSON.parse(JSON.stringify(itemToDel)));
+            await apiFetch(`/api/files/${delId}`, { method: 'DELETE' });
+          }
+        }
+
+        items = items.filter(i => !idsToDelete.includes(i.id));
+
+        if (idsToDelete.includes(activeItemId)) {
+          activeItemId = null;
+          document.getElementById('emptyState').style.display = 'flex';
+          document.getElementById('editorContainer').style.display = 'none';
+        }
+
+        renderTree();
+        showUndoToast(target.name, deletedItems);
+      }
+    }
+
+    function showUndoToast(itemName, deletedItems) {
+      lastDeletedBatch = deletedItems;
+      const container = document.getElementById('toastContainer');
+
+      container.innerHTML = `
+        <div class="toast-undo" id="undoToast">
+          <span>已删除 "${itemName}"</span>
+          <button class="undo-btn" onclick="undoDelete()">撤销 (返回)</button>
+        </div>
+      `;
+
+      clearTimeout(undoTimer);
+      undoTimer = setTimeout(() => {
+        const toast = document.getElementById('undoToast');
+        if (toast) toast.remove();
+        lastDeletedBatch = null;
+      }, 7000);
+    }
+
+    async function undoDelete() {
+      if (!lastDeletedBatch || lastDeletedBatch.length === 0) return;
+
+      const restoredBatch = [...lastDeletedBatch];
+      lastDeletedBatch = null;
+
+      const toast = document.getElementById('undoToast');
+      if (toast) toast.remove();
+
+      for (const item of restoredBatch) {
+        items.push(item);
+        await saveItemToBackend(item);
+        if (item.type === 'file' && item.token) {
+          await apiFetch('/api/files/content', {
+            method: 'POST',
+            body: JSON.stringify({
+              id: item.id,
+              token: item.token,
+              content: item._content || ''
+            })
+          });
+        }
+      }
+
+      renderTree();
+      alert('已成功恢复删除的内容！');
     }
 
     function openMoveModal(e, id) {
@@ -560,41 +752,15 @@
       });
     }
 
-    function viewShareLink(e, id) {
+    async function viewShareLink(e, id) {
       e.stopPropagation();
       closeAllDropdowns();
-      selectFile(id);
-    }
-
-    async function deleteItem(e, id) {
-      e.stopPropagation();
-      closeAllDropdowns();
-      const target = items.find(i => i.id === id);
-      if (!target) return;
-
-      if (confirm(`确认删除 ${target.name} 吗？`)) {
-        const idsToDelete = [id];
-        if (target.type === 'folder') {
-          const findChildren = (pid) => {
-            items.filter(i => i.parentId === pid).forEach(child => {
-              idsToDelete.push(child.id);
-              if (child.type === 'folder') findChildren(child.id);
-            });
-          };
-          findChildren(id);
-        }
-
-        for (const delId of idsToDelete) {
-          await apiFetch(`/api/files/${delId}`, { method: 'DELETE' });
-        }
-
-        items = items.filter(i => !idsToDelete.includes(i.id));
-        if (idsToDelete.includes(activeItemId)) {
-          activeItemId = null;
-          document.getElementById('emptyState').style.display = 'flex';
-          document.getElementById('editorContainer').style.display = 'none';
-        }
-        renderTree();
+      await selectFile(id);
+      
+      const file = items.find(i => i.id === id);
+      openShareSection();
+      if (file && file.token) {
+        showShareResult(file.token);
       }
     }
 
@@ -619,45 +785,38 @@
       }, 50);
     }
 
+    // 🌟 打字时仅更改状态，无网络交互，流畅零延迟
     function handleEditorInput() {
       updateStats();
       const file = items.find(i => i.id === activeItemId);
       if (file) {
         file._content = document.getElementById('textEditor').value;
       }
-
-      const statusEl = document.getElementById('saveStatus');
-      statusEl.textContent = '⏳ 保存中...';
-      statusEl.className = 'save-status saving';
-
-      clearTimeout(autoSaveTimer);
-      autoSaveTimer = setTimeout(async () => {
-        await flushSaveCurrentFile();
-      }, 600);
+      setSaveStatus('unsaved');
     }
 
-    // 🌟 核心保存函数：同时保存元数据与 R2 文本内容
+    // 手动点击保存按钮
+    async function manualSave() {
+      await flushSaveCurrentFile();
+    }
+
+    // 🌟 执行保存核心逻辑
     async function flushSaveCurrentFile() {
       if (!activeItemId) return;
-      clearTimeout(autoSaveTimer);
 
       const file = items.find(i => i.id === activeItemId);
       if (!file || file.type !== 'file') return;
 
+      setSaveStatus('saving');
       const content = document.getElementById('textEditor').value;
       file._content = content;
 
-      // 确保有 Token
       if (!file.token) {
         file.token = crypto.randomUUID();
       }
 
-      const statusEl = document.getElementById('saveStatus');
       try {
-        // 1. 保存结构定义
         await saveItemToBackend(file);
-
-        // 2. 将文本内容实际写入 Worker (必须带 Token 与文件内容)
         await apiFetch('/api/files/content', {
           method: 'POST',
           body: JSON.stringify({
@@ -667,21 +826,18 @@
           })
         });
 
-        if (statusEl) {
-          statusEl.textContent = '✓ 已自动保存';
-          statusEl.className = 'save-status';
-        }
+        setSaveStatus('saved');
       } catch (e) {
-        console.error("保存写入错误:", e);
+        console.error("保存失败:", e);
+        const statusEl = document.getElementById('saveStatus');
         if (statusEl) {
           statusEl.textContent = '❌ 保存失败';
-          statusEl.className = 'save-status saving';
+          statusEl.className = 'save-status unsaved';
         }
       }
     }
 
     async function saveItemToBackend(item) {
-      // 过滤掉前端临时变量 _content
       const { _content, ...itemData } = item;
       await apiFetch('/api/files/save', {
         method: 'POST',
@@ -732,6 +888,22 @@
       const editor = document.getElementById('textEditor');
       editor.className = `editor-textarea ${fontClass}`;
     }
+
+    // 🌟 全局绑定的保存快捷键 Ctrl+S / Cmd+S
+    window.addEventListener('keydown', function(e) {
+      if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+        e.preventDefault();
+        manualSave();
+      }
+    });
+
+    // 🌟 离开/关闭页面前，如果有更改，触发浏览器默认防丢提示
+    window.addEventListener('beforeunload', function (e) {
+      if (isDirty) {
+        e.preventDefault();
+        e.returnValue = '';
+      }
+    });
 
     if (getStoredPassword()) {
       document.getElementById('loginMask').style.display = 'none';

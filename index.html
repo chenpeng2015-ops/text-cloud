@@ -9,168 +9,75 @@
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-      background-color: #f8fafc;
-      color: #1e293b;
-      height: 100vh;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
+      background-color: #f8fafc; color: #1e293b; height: 100vh; display: flex; flex-direction: column; overflow: hidden;
     }
-    
-    .navbar {
-      height: 48px;
-      background: #fff;
-      border-bottom: 1px solid #e2e8f0;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 16px;
-      font-weight: 600;
-      font-size: 14px;
-    }
-    
+    .navbar { height: 48px; background: #fff; border-bottom: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; font-weight: 600; font-size: 14px; }
     .main-container { flex: 1; display: flex; overflow: hidden; }
-    
     .sidebar { width: 280px; background: #fff; border-right: 1px solid #e2e8f0; display: flex; flex-direction: column; }
     .sidebar-header { padding: 12px; display: flex; justify-content: space-between; align-items: center; }
     .sidebar-title { font-size: 13px; font-weight: 600; color: #475569; }
     .actions-group { display: flex; gap: 6px; }
-    .icon-btn {
-      padding: 4px 8px; border-radius: 4px; border: none;
-      background: #2563eb; color: #fff; cursor: pointer; font-size: 12px; font-weight: 500;
-    }
+    .icon-btn { padding: 4px 8px; border-radius: 4px; border: none; background: #2563eb; color: #fff; cursor: pointer; font-size: 12px; font-weight: 500; }
     .icon-btn.folder { background: #f59e0b; }
-    
     .search-box { padding: 0 12px 10px; }
     .search-input { width: 100%; padding: 6px 10px; font-size: 12px; border: 1px solid #cbd5e1; border-radius: 4px; outline: none; }
-    
     .file-tree { flex: 1; overflow-y: auto; padding: 4px; user-select: none; }
     .tree-node-wrapper { position: relative; }
-    .tree-node {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 6px 8px; border-radius: 6px; font-size: 13px; cursor: pointer;
-      margin-bottom: 2px; color: #334155;
-    }
+    .tree-node { display: flex; align-items: center; justify-content: space-between; padding: 6px 8px; border-radius: 6px; font-size: 13px; cursor: pointer; margin-bottom: 2px; color: #334155; }
     .tree-node:hover { background: #f1f5f9; }
     .tree-node.active { background: #eff6ff; color: #2563eb; font-weight: 500; }
     .node-info { display: flex; align-items: center; gap: 6px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; }
     .arrow { display: inline-block; width: 12px; font-size: 10px; color: #94a3b8; transition: transform 0.2s; }
     .arrow.open { transform: rotate(90deg); }
-
-    .more-btn {
-      display: none; padding: 2px 6px; border-radius: 4px; border: none; background: transparent;
-      color: #64748b; font-weight: bold; cursor: pointer; font-size: 14px;
-    }
+    .more-btn { display: none; padding: 2px 6px; border-radius: 4px; border: none; background: transparent; color: #64748b; font-weight: bold; cursor: pointer; font-size: 14px; }
     .tree-node:hover .more-btn { display: inline-block; }
-    .more-btn:hover { background: #e2e8f0; color: #0f172a; }
-
-    .dropdown-menu {
-      position: absolute; right: 8px; top: 28px; z-index: 100;
-      background: #fff; border: 1px solid #e2e8f0; border-radius: 6px;
-      box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); width: 140px; padding: 4px 0; display: none;
-    }
-    .dropdown-item {
-      padding: 6px 12px; font-size: 12px; color: #334155; cursor: pointer; display: flex; align-items: center; justify-content: space-between;
-    }
+    .dropdown-menu { position: absolute; right: 8px; top: 28px; z-index: 100; background: #fff; border: 1px solid #e2e8f0; border-radius: 6px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); width: 140px; padding: 4px 0; display: none; }
+    .dropdown-item { padding: 6px 12px; font-size: 12px; color: #334155; cursor: pointer; display: flex; align-items: center; justify-content: space-between; }
     .dropdown-item:hover { background: #f8fafc; color: #2563eb; }
     .dropdown-item.danger:hover { background: #fef2f2; color: #ef4444; }
-
     .content-area { flex: 1; display: flex; flex-direction: column; background: #fff; overflow-y: auto; }
     .editor-container { display: none; flex-direction: column; height: 100%; padding: 16px 24px; gap: 8px; }
-    
     .top-bar { display: flex; justify-content: space-between; align-items: center; padding-bottom: 8px; border-bottom: 1px solid #f1f5f9; }
     .save-status { font-size: 12px; color: #10b981; font-weight: 500; display: flex; align-items: center; gap: 4px; }
     .save-status.saving { color: #f59e0b; }
-    
     .controls-group { display: flex; align-items: center; gap: 12px; font-size: 12px; color: #64748b; }
     .select-control { padding: 3px 6px; font-size: 12px; border: 1px solid #cbd5e1; border-radius: 4px; outline: none; background: #fff; }
     .font-btn { padding: 2px 8px; border: 1px solid #cbd5e1; background: #fff; border-radius: 4px; cursor: pointer; }
-
-    .toolbar-bar {
-      display: flex; align-items: center; gap: 8px; background: #f8fafc; border: 1px solid #e2e8f0;
-      border-bottom: none; border-top-left-radius: 8px; border-top-right-radius: 8px; padding: 6px 12px; flex-wrap: wrap;
-    }
-    .toolbar-btn {
-      padding: 4px 8px; border: 1px solid #cbd5e1; background: #fff; border-radius: 4px;
-      cursor: pointer; font-size: 12px; color: #334155; display: flex; align-items: center; gap: 4px;
-    }
-    .toolbar-btn:hover { background: #f1f5f9; color: #2563eb; }
-
-    .editor-textarea {
-      flex: 1; width: 100%; min-height: 320px; padding: 16px; border: 1px solid #e2e8f0;
-      border-bottom-left-radius: 8px; border-bottom-right-radius: 8px; outline: none; font-size: 14px; line-height: 1.7;
-      resize: none; background: #fafafa; color: #0f172a; transition: border-color 0.2s, background-color 0.2s;
-    }
+    .toolbar-bar { display: flex; align-items: center; gap: 8px; background: #f8fafc; border: 1px solid #e2e8f0; border-bottom: none; border-top-left-radius: 8px; border-top-right-radius: 8px; padding: 6px 12px; flex-wrap: wrap; }
+    .toolbar-btn { padding: 4px 8px; border: 1px solid #cbd5e1; background: #fff; border-radius: 4px; cursor: pointer; font-size: 12px; color: #334155; display: flex; align-items: center; gap: 4px; }
+    .editor-textarea { flex: 1; width: 100%; min-height: 320px; padding: 16px; border: 1px solid #e2e8f0; border-bottom-left-radius: 8px; border-bottom-right-radius: 8px; outline: none; font-size: 14px; line-height: 1.7; resize: none; background: #fafafa; color: #0f172a; }
     .editor-textarea:focus { border-color: #3b82f6; background: #fff; }
-    
-    .font-mono { font-family: "Consolas", "Fira Code", "Courier New", monospace; }
-    .font-sans { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-    .font-serif { font-family: "Georgia", "Songti SC", "SimSun", serif; }
-
+    .font-mono { font-family: "Consolas", "Fira Code", monospace; }
+    .font-sans { font-family: -apple-system, BlinkMacSystemFont, sans-serif; }
+    .font-serif { font-family: "Georgia", serif; }
     .stats-bar { text-align: right; font-size: 12px; color: #94a3b8; padding-top: 2px; }
-
     .share-section { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px; margin-top: 8px; }
     .share-header { font-size: 13px; font-weight: 600; color: #334155; margin-bottom: 6px; }
     .share-tips { font-size: 11px; color: #94a3b8; margin-bottom: 12px; }
     .token-row { display: flex; gap: 8px; }
     .token-input { flex: 1; padding: 6px 10px; font-size: 12px; border: 1px solid #cbd5e1; border-radius: 4px; outline: none; }
     .btn-action { background: #2563eb; color: #fff; border: none; padding: 6px 14px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: 500; }
-
-    .share-result {
-      position: relative; display: none; background: #f0fdf4; border: 1px solid #bbf7d0;
-      border-radius: 8px; padding: 14px; margin-top: 12px;
-    }
-    .close-share-btn {
-      position: absolute; right: 12px; top: 10px; border: none; background: transparent;
-      font-size: 16px; color: #166534; cursor: pointer; font-weight: bold; padding: 2px 6px;
-    }
-    .close-share-btn:hover { color: #ef4444; }
+    .share-result { position: relative; display: none; background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; padding: 14px; margin-top: 12px; }
+    .close-share-btn { position: absolute; right: 12px; top: 10px; border: none; background: transparent; font-size: 16px; color: #166534; cursor: pointer; font-weight: bold; }
     .result-title { font-size: 12px; color: #166534; font-weight: 600; margin-bottom: 8px; }
     .link-input { width: 100%; padding: 8px; font-size: 12px; border: 1px solid #86efac; border-radius: 4px; color: #15803d; background: #fff; font-family: monospace; }
     .qr-container { margin-top: 12px; display: flex; justify-content: center; }
-
     .empty-state { margin: auto; text-align: center; color: #64748b; }
-
-    .login-mask, .modal-mask {
-      position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-      background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px);
-      display: flex; justify-content: center; align-items: center; z-index: 999;
-    }
-    .login-card, .modal-card {
-      background: #fff; padding: 24px; border-radius: 12px; width: 380px;
-      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); text-align: left;
-    }
+    .login-mask, .modal-mask { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); display: flex; justify-content: center; align-items: center; z-index: 999; }
+    .login-card, .modal-card { background: #fff; padding: 24px; border-radius: 12px; width: 380px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); }
     .login-title, .modal-title { font-size: 15px; font-weight: 600; margin-bottom: 14px; color: #0f172a; text-align: center; }
     .form-group { margin-bottom: 14px; }
     .form-label { font-size: 12px; color: #64748b; display: block; margin-bottom: 4px; }
-    .login-input, .login-select {
-      width: 100%; padding: 8px 12px; font-size: 13px; border: 1px solid #cbd5e1; border-radius: 6px; outline: none;
-    }
+    .login-input, .login-select { width: 100%; padding: 8px 12px; font-size: 13px; border: 1px solid #cbd5e1; border-radius: 6px; outline: none; }
     .login-btn { width: 100%; padding: 10px; background: #2563eb; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 500; font-size: 14px; margin-top: 8px; }
-
-    .move-folder-tree {
-      max-height: 260px; overflow-y: auto; border: 1px solid #e2e8f0;
-      border-radius: 6px; padding: 6px; margin-bottom: 16px; background: #f8fafc;
-    }
-    .folder-select-item {
-      padding: 8px 10px; font-size: 13px; border-radius: 6px; cursor: pointer;
-      display: flex; align-items: center; gap: 6px; color: #334155; margin-bottom: 2px;
-    }
+    .move-folder-tree { max-height: 260px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 6px; padding: 6px; margin-bottom: 16px; background: #f8fafc; }
+    .folder-select-item { padding: 8px 10px; font-size: 13px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 6px; color: #334155; margin-bottom: 2px; }
     .folder-select-item:hover { background: #e2e8f0; color: #2563eb; }
     .modal-actions { display: flex; justify-content: flex-end; gap: 8px; }
     .btn-secondary { background: #e2e8f0; color: #475569; border: none; padding: 6px 14px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: 500; }
-
-    .symbol-grid {
-      display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px;
-      max-height: 240px; overflow-y: auto; border: 1px solid #e2e8f0;
-      padding: 10px; border-radius: 6px; background: #f8fafc; margin-bottom: 14px;
-    }
-    .symbol-item {
-      display: flex; justify-content: center; align-items: center;
-      height: 38px; font-size: 18px; background: #fff; border: 1px solid #cbd5e1;
-      border-radius: 6px; cursor: pointer; transition: all 0.15s;
-    }
-    .symbol-item:hover { background: #eff6ff; border-color: #2563eb; transform: scale(1.1); }
+    .symbol-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; max-height: 240px; overflow-y: auto; border: 1px solid #e2e8f0; padding: 10px; border-radius: 6px; background: #f8fafc; margin-bottom: 14px; }
+    .symbol-item { display: flex; justify-content: center; align-items: center; height: 38px; font-size: 18px; background: #fff; border: 1px solid #cbd5e1; border-radius: 6px; cursor: pointer; }
+    .symbol-item:hover { background: #eff6ff; border-color: #2563eb; }
   </style>
 </head>
 <body>
@@ -189,7 +96,6 @@
           <option value="3600000">1 小时</option>
           <option value="86400000" selected>1 天</option>
           <option value="2592000000">1 个月 (30天)</option>
-          <option value="31536000000">1 年</option>
         </select>
       </div>
       <button class="login-btn" onclick="login()">登 录</button>
@@ -207,7 +113,7 @@
     </div>
   </div>
 
-  <!-- 插入特殊符号面板 -->
+  <!-- 特殊符号弹窗 -->
   <div class="modal-mask" id="symbolModal" style="display: none;">
     <div class="modal-card">
       <div class="modal-title">✨ 选择特殊符号</div>
@@ -269,7 +175,7 @@
             
             <span>字号:</span>
             <button class="font-btn" onclick="changeFontSize(-1)">-</button>
-            <span id="fontSizeDisplay">14</span>
+            <span id="fontSizeDisplay">20</span>
             <button class="font-btn" onclick="changeFontSize(1)">+</button>
           </div>
         </div>
@@ -288,8 +194,7 @@
           <button class="toolbar-btn" onclick="openSymbolModal()">✨ 插入特殊符号</button>
         </div>
 
-        <!-- 增加 onpaste 与 onblur 事件确保粘贴和切出时 100% 保存 -->
-        <textarea id="textEditor" class="editor-textarea font-mono" oninput="handleEditorInput()" onpaste="handlePasteEvent()" onblur="flushSaveCurrentFile()"></textarea>
+        <textarea id="textEditor" class="editor-textarea font-mono" oninput="handleEditorInput()" onpaste="handlePasteEvent()"></textarea>
         <div class="stats-bar" id="statsBar">0 字 · 0 行</div>
 
         <div class="share-section">
@@ -314,7 +219,7 @@
   </div>
 
   <script>
-    const API_BASE = "https://text-cloud-api.chenpeng2015.workers.dev"; // ⚠️ 修改为您的 Worker 实际域名
+    const API_BASE = "https://text-cloud-api.chenpeng2015.workers.dev"; // ⚠️ 替换为您的 Worker 实际域名
 
     let items = [];
     let activeItemId = null;
@@ -323,6 +228,7 @@
     let openFolderIds = new Set();
     let currentFontSize = 14;
     let autoSaveTimer = null;
+    let isSaving = false;
 
     const SYMBOL_SETS = {
       gesture: ["👍", "👎", "👌", "✌️", "🤞", "🤟", "🤘", "🤙", "👈", "👉", "👆", "👇", "✋", "🤚", "🖐️", "🖖", "👋", "👏", "🙌", "👐", "🤲", "🤝", "🙏", "✍️"],
@@ -503,8 +409,10 @@
     async function selectFile(id) {
       if (activeItemId === id) return;
 
-      // 🌟【关键修复】：切换文件前，先强制保存当前正在编辑的文档
-      await flushSaveCurrentFile();
+      // 1. 切换文件前强制保存当前正在编辑的文档
+      if (activeItemId) {
+        await flushSaveCurrentFile();
+      }
 
       activeItemId = id;
       const file = items.find(i => i.id === id);
@@ -515,8 +423,25 @@
       document.getElementById('editorContainer').style.display = 'flex';
       document.getElementById('tokenInput').value = file.token || '';
 
-      const res = await fetch(`${API_BASE}/sub/${file.token}/${encodeURIComponent(file.name)}`);
-      document.getElementById('textEditor').value = res.ok ? await res.text() : '';
+      // 清空当前编辑器防止展示旧数据
+      document.getElementById('textEditor').value = "正在从云端加载文本...";
+
+      // 如果有 content 缓存优先展示，否则发请求拉取
+      if (typeof file._content !== 'undefined') {
+        document.getElementById('textEditor').value = file._content;
+      } else if (file.token) {
+        try {
+          const res = await fetch(`${API_BASE}/sub/${file.token}/${encodeURIComponent(file.name)}?t=${Date.now()}`);
+          const text = res.ok ? await res.text() : '';
+          file._content = text;
+          document.getElementById('textEditor').value = text;
+        } catch (e) {
+          document.getElementById('textEditor').value = '';
+        }
+      } else {
+        document.getElementById('textEditor').value = '';
+        file._content = '';
+      }
 
       updateStats();
       if (file.token) {
@@ -528,13 +453,15 @@
     }
 
     async function createNewItem(type) {
-      await flushSaveCurrentFile(); // 强制保存当前
+      if (activeItemId) await flushSaveCurrentFile();
 
       const label = type === 'folder' ? '文件夹' : '文件';
       const name = prompt(`请输入${label}名称:`, `新建${label}`);
       if (!name) return;
 
-      const newItem = { id: Date.now().toString(), name, type, parentId: selectedParentFolderId, token: "", content: "" };
+      const newItem = { id: Date.now().toString(), name, type, parentId: selectedParentFolderId, token: type === 'file' ? crypto.randomUUID() : "" };
+      if (type === 'file') newItem._content = "";
+
       items.push(newItem);
       await saveItemToBackend(newItem);
 
@@ -686,7 +613,6 @@
       if (emoji) insertAtCursor(emoji);
     }
 
-    // 🌟【关键修复】：专门处理粘贴事件
     function handlePasteEvent() {
       setTimeout(() => {
         handleEditorInput();
@@ -695,6 +621,11 @@
 
     function handleEditorInput() {
       updateStats();
+      const file = items.find(i => i.id === activeItemId);
+      if (file) {
+        file._content = document.getElementById('textEditor').value;
+      }
+
       const statusEl = document.getElementById('saveStatus');
       statusEl.textContent = '⏳ 保存中...';
       statusEl.className = 'save-status saving';
@@ -702,28 +633,46 @@
       clearTimeout(autoSaveTimer);
       autoSaveTimer = setTimeout(async () => {
         await flushSaveCurrentFile();
-      }, 800);
+      }, 600);
     }
 
-    // 🌟【关键修复】：立即保存当前编辑器的内容，不经过定时器延迟
+    // 🌟 核心保存函数：同时保存元数据与 R2 文本内容
     async function flushSaveCurrentFile() {
       if (!activeItemId) return;
       clearTimeout(autoSaveTimer);
 
       const file = items.find(i => i.id === activeItemId);
-      if (!file) return;
+      if (!file || file.type !== 'file') return;
 
-      const currentText = document.getElementById('textEditor').value;
-      file.content = currentText;
+      const content = document.getElementById('textEditor').value;
+      file._content = content;
+
+      // 确保有 Token
+      if (!file.token) {
+        file.token = crypto.randomUUID();
+      }
 
       const statusEl = document.getElementById('saveStatus');
       try {
+        // 1. 保存结构定义
         await saveItemToBackend(file);
+
+        // 2. 将文本内容实际写入 Worker (必须带 Token 与文件内容)
+        await apiFetch('/api/files/content', {
+          method: 'POST',
+          body: JSON.stringify({
+            id: file.id,
+            token: file.token,
+            content: content
+          })
+        });
+
         if (statusEl) {
           statusEl.textContent = '✓ 已自动保存';
           statusEl.className = 'save-status';
         }
       } catch (e) {
+        console.error("保存写入错误:", e);
         if (statusEl) {
           statusEl.textContent = '❌ 保存失败';
           statusEl.className = 'save-status saving';
@@ -732,9 +681,11 @@
     }
 
     async function saveItemToBackend(item) {
+      // 过滤掉前端临时变量 _content
+      const { _content, ...itemData } = item;
       await apiFetch('/api/files/save', {
         method: 'POST',
-        body: JSON.stringify(item)
+        body: JSON.stringify(itemData)
       });
     }
 
@@ -746,9 +697,7 @@
       document.getElementById('tokenInput').value = token;
 
       file.token = token;
-      file.content = document.getElementById('textEditor').value;
-      
-      await saveItemToBackend(file);
+      await flushSaveCurrentFile();
       showShareResult(token);
     }
 

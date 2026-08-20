@@ -92,7 +92,7 @@
     /* 快捷工具栏 */
     .toolbar-bar {
       display: flex; align-items: center; gap: 8px; background: #f8fafc; border: 1px solid #e2e8f0;
-      border-bottom: none; border-top-left-radius: 8px; border-top-right-radius: 8px; padding: 6px 12px;
+      border-bottom: none; border-top-left-radius: 8px; border-top-right-radius: 8px; padding: 6px 12px; flex-wrap: wrap;
     }
     .toolbar-btn {
       padding: 4px 8px; border: 1px solid #cbd5e1; background: #fff; border-radius: 4px;
@@ -143,7 +143,7 @@
       display: flex; justify-content: center; align-items: center; z-index: 999;
     }
     .login-card, .modal-card {
-      background: #fff; padding: 24px; border-radius: 12px; width: 360px;
+      background: #fff; padding: 24px; border-radius: 12px; width: 380px;
       box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); text-align: left;
     }
     .login-title, .modal-title { font-size: 15px; font-weight: 600; margin-bottom: 14px; color: #0f172a; text-align: center; }
@@ -166,13 +166,22 @@
     .folder-select-item:hover { background: #e2e8f0; color: #2563eb; }
     .modal-actions { display: flex; justify-content: flex-end; gap: 8px; }
     .btn-secondary { background: #e2e8f0; color: #475569; border: none; padding: 6px 14px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: 500; }
+
+    /* 特殊符号网格网面板 */
+    .symbol-grid {
+      display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px;
+      max-height: 240px; overflow-y: auto; border: 1px solid #e2e8f0;
+      padding: 10px; border-radius: 6px; background: #f8fafc; margin-bottom: 14px;
+    }
+    .symbol-item {
+      display: flex; justify-content: center; align-items: center;
+      height: 38px; font-size: 18px; background: #fff; border: 1px solid #cbd5e1;
+      border-radius: 6px; cursor: pointer; transition: all 0.15s;
+    }
+    .symbol-item:hover { background: #eff6ff; border-color: #2563eb; transform: scale(1.1); }
   </style>
 </head>
 <body>
-
-  <!-- 隐藏的文件选择器 -->
-  <input type="file" id="imageFileInput" accept="image/*" style="display:none;" onchange="handleFileSelect(event, 'image')">
-  <input type="file" id="generalFileInput" style="display:none;" onchange="handleFileSelect(event, 'file')">
 
   <!-- 登录遮罩 -->
   <div class="login-mask" id="loginMask">
@@ -202,6 +211,26 @@
       <div class="move-folder-tree" id="moveFolderTree"></div>
       <div class="modal-actions">
         <button class="btn-secondary" onclick="closeMoveModal()">取消</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 插入特殊符号面板 -->
+  <div class="modal-mask" id="symbolModal" style="display: none;">
+    <div class="modal-card">
+      <div class="modal-title">✨ 选择特殊符号</div>
+      <div style="margin-bottom: 10px;">
+        <select id="symbolCategorySelect" class="login-select" onchange="renderSymbols(this.value)">
+          <option value="gesture">✋ 常用手势</option>
+          <option value="flag">🚩 旗帜标识</option>
+          <option value="mark">📌 常用标记与记号</option>
+          <option value="math">∑ 数学与逻辑符号</option>
+          <option value="arrow">➔ 常用箭头</option>
+        </select>
+      </div>
+      <div class="symbol-grid" id="symbolGrid"></div>
+      <div class="modal-actions">
+        <button class="btn-secondary" onclick="closeSymbolModal()">关闭</button>
       </div>
     </div>
   </div>
@@ -255,22 +284,19 @@
 
         <div class="toolbar-bar">
           <select class="select-control" onchange="insertEmoji(this.value); this.selectedIndex=0;">
-            <option value="" disabled selected>😀 插入表情</option>
+            <option value="" disabled selected>😀 快捷 Emoji</option>
             <option value="😀">😀 笑脸</option>
             <option value="👍">👍 赞</option>
             <option value="🎉">🎉 庆祝</option>
             <option value="🔥">🔥 热门</option>
             <option value="🚀">🚀 火箭</option>
-            <option value="📌">📌 图钉</option>
-            <option value="✅">✅ 完成</option>
             <option value="💡">💡 想法</option>
           </select>
-          <button class="toolbar-btn" onclick="document.getElementById('imageFileInput').click()">🖼️ 插入图片</button>
-          <button class="toolbar-btn" onclick="document.getElementById('generalFileInput').click()">📎 插入附件</button>
-          <span style="font-size:11px; color:#94a3b8; margin-left:auto;">支持剪贴板图片直接粘贴 (Ctrl+V)</span>
+
+          <button class="toolbar-btn" onclick="openSymbolModal()">✨ 插入特殊符号</button>
         </div>
 
-        <textarea id="textEditor" class="editor-textarea font-mono" oninput="handleEditorInput()" onpaste="handlePaste(event)"></textarea>
+        <textarea id="textEditor" class="editor-textarea font-mono" oninput="handleEditorInput()"></textarea>
         <div class="stats-bar" id="statsBar">0 字 · 0 行</div>
 
         <div class="share-section">
@@ -304,6 +330,15 @@
     let openFolderIds = new Set();
     let currentFontSize = 14;
     let autoSaveTimer = null;
+
+    // 特殊符号词库配置
+    const SYMBOL_SETS = {
+      gesture: ["👍", "👎", "👌", "✌️", "🤞", "🤟", "🤘", "🤙", "👈", "👉", "👆", "👇", "✋", "🤚", "🖐️", "🖖", "👋", "👏", "🙌", "👐", "🤲", "🤝", "🙏", "✍️"],
+      flag: ["🚩", "🏳️", "🏴", "🏁", "🎌", "🏳️‍🌈", "🏴‍☠️", "🇨🇳", "🇺🇸", "🇯🇵", "🇬🇧", "🇫🇷", "🇩🇪", "🇷🇺", "🇰🇷", "🇮🇳"],
+      mark: ["📌", "📍", "🔖", "🏷️", "✅", "❌", "❎", "❓", "❗", "⚠️", "⛔", "🚫", "⚡", "💡", "🔔", "⭐", "🌟", "✨", "🎯", "💯", "⭕", "❌", "🔴", "🟢", "🔵", "🟡"],
+      math: ["±", "×", "÷", "≈", "≠", "≤", "≥", "∞", "∑", "∏", "√", "∂", "∫", "∝", "∈", "∉", "⊆", "⊂", "∪", "∩", "⊥", "∠", "∴", "∵", "α", "β", "γ", "θ", "π"],
+      arrow: ["➔", "➔", "➜", "➟", "➞", "⬆️", "⬇️", "⬅️", "➡️", "↗️", "↘️", "↙️", "↖️", "↔️", "↕️", "🔄", "🔄", "🔁", "🔂"]
+    };
 
     function getStoredPassword() {
       const authData = localStorage.getItem('admin_auth');
@@ -526,7 +561,7 @@
       }
     }
 
-    /* 🌟 可视化文件夹选择逻辑 */
+    /* 移动文件夹逻辑 */
     function openMoveModal(e, id) {
       e.stopPropagation();
       closeAllDropdowns();
@@ -535,14 +570,12 @@
       const container = document.getElementById('moveFolderTree');
       container.innerHTML = '';
 
-      // 根目录选项
       const rootDiv = document.createElement('div');
       rootDiv.className = 'folder-select-item';
       rootDiv.innerHTML = '📁 [根目录]';
       rootDiv.onclick = () => selectTargetFolder(null);
       container.appendChild(rootDiv);
 
-      // 递归绘制全量文件夹树
       function renderMoveFolderNodes(parentId, depth) {
         const folders = items.filter(i => i.type === 'folder' && i.id !== movingTargetId && i.parentId === parentId);
         folders.forEach(f => {
@@ -573,6 +606,34 @@
         renderTree();
       }
       closeMoveModal();
+    }
+
+    /* 符号选择面板逻辑 */
+    function openSymbolModal() {
+      renderSymbols('gesture');
+      document.getElementById('symbolCategorySelect').value = 'gesture';
+      document.getElementById('symbolModal').style.display = 'flex';
+    }
+
+    function closeSymbolModal() {
+      document.getElementById('symbolModal').style.display = 'none';
+    }
+
+    function renderSymbols(category) {
+      const grid = document.getElementById('symbolGrid');
+      grid.innerHTML = '';
+      const symbols = SYMBOL_SETS[category] || [];
+
+      symbols.forEach(sym => {
+        const btn = document.createElement('div');
+        btn.className = 'symbol-item';
+        btn.textContent = sym;
+        btn.onclick = () => {
+          insertAtCursor(sym);
+          closeSymbolModal();
+        };
+        grid.appendChild(btn);
+      });
     }
 
     function viewShareLink(e, id) {
@@ -626,56 +687,6 @@
 
     function insertEmoji(emoji) {
       if (emoji) insertAtCursor(emoji);
-    }
-
-    async function handleFileSelect(e, type) {
-      const file = e.target.files[0];
-      if (file) {
-        await uploadAndInsertFile(file, type);
-        e.target.value = '';
-      }
-    }
-
-    async function handlePaste(e) {
-      const clipboardItems = (e.clipboardData || e.originalEvent.clipboardData).items;
-      for (let item of clipboardItems) {
-        if (item.kind === 'file') {
-          e.preventDefault();
-          const file = item.getAsFile();
-          const isImg = file.type.startsWith('image/');
-          await uploadAndInsertFile(file, isImg ? 'image' : 'file');
-        }
-      }
-    }
-
-    async function uploadAndInsertFile(file, type) {
-      const statusEl = document.getElementById('saveStatus');
-      statusEl.textContent = '⏳ 正在上传附件...';
-      statusEl.className = 'save-status saving';
-
-      try {
-        const formData = new FormData();
-        formData.append('file', file, file.name || `upload-${Date.now()}.${type === 'image' ? 'png' : 'bin'}`);
-
-        const res = await apiFetch('/api/upload', {
-          method: 'POST',
-          body: formData
-        });
-
-        const data = await res.json();
-        if (data.success) {
-          const insertText = type === 'image' 
-            ? `\n![${data.name}](${data.url})\n`
-            : `\n[📎 ${data.name}](${data.url})\n`;
-          insertAtCursor(insertText);
-          statusEl.textContent = '✓ 上传成功';
-          statusEl.className = 'save-status';
-        } else {
-          alert('上传失败: ' + (data.error || '未知错误'));
-        }
-      } catch (e) {
-        alert('文件上传出错: ' + e.message);
-      }
     }
 
     function handleEditorInput() {

@@ -574,37 +574,29 @@
       if (!target) return;
 
       if (confirm(`确认删除 ${target.name} 吗？`)) {
-        const deletedItems = [];
-        const idsToDelete = [id];
+        try {
+          // 请求后端统一执行级联删除
+          const res = await apiFetch(`/api/files/${id}`, { method: 'DELETE' });
+          const data = await res.json();
+          const deletedIds = data.deletedIds || [id];
 
-        if (target.type === 'folder') {
-          const findChildren = (pid) => {
-            items.filter(i => i.parentId === pid).forEach(child => {
-              idsToDelete.push(child.id);
-              if (child.type === 'folder') findChildren(child.id);
-            });
-          };
-          findChildren(id);
-        }
+          // 记录备份以备撤销
+          const deletedItems = items.filter(i => deletedIds.includes(i.id));
 
-        for (const delId of idsToDelete) {
-          const itemToDel = items.find(i => i.id === delId);
-          if (itemToDel) {
-            deletedItems.push(JSON.parse(JSON.stringify(itemToDel)));
-            await apiFetch(`/api/files/${delId}`, { method: 'DELETE' });
+          // 从本地 items 中彻底移除
+          items = items.filter(i => !deletedIds.includes(i.id));
+
+          if (deletedIds.includes(activeItemId)) {
+            activeItemId = null;
+            document.getElementById('emptyState').style.display = 'flex';
+            document.getElementById('editorContainer').style.display = 'none';
           }
+
+          renderTree();
+          showUndoToast(target.name, deletedItems);
+        } catch (err) {
+          alert('删除失败：' + err.message);
         }
-
-        items = items.filter(i => !idsToDelete.includes(i.id));
-
-        if (idsToDelete.includes(activeItemId)) {
-          activeItemId = null;
-          document.getElementById('emptyState').style.display = 'flex';
-          document.getElementById('editorContainer').style.display = 'none';
-        }
-
-        renderTree();
-        showUndoToast(target.name, deletedItems);
       }
     }
 

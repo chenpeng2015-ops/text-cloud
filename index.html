@@ -8,14 +8,15 @@
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
       background-color: #f8fafc;
-      color: #334155;
+      color: #1e293b;
       height: 100vh;
       display: flex;
       flex-direction: column;
       overflow: hidden;
     }
+    
     .navbar {
       height: 48px;
       background: #fff;
@@ -25,63 +26,108 @@
       justify-content: space-between;
       padding: 0 16px;
       font-weight: 600;
-      font-size: 15px;
+      font-size: 14px;
     }
+    
     .main-container { flex: 1; display: flex; overflow: hidden; }
     
     /* 侧边栏 */
-    .sidebar { width: 260px; background: #fff; border-right: 1px solid #e2e8f0; display: flex; flex-direction: column; }
+    .sidebar { width: 280px; background: #fff; border-right: 1px solid #e2e8f0; display: flex; flex-direction: column; }
     .sidebar-header { padding: 12px; display: flex; justify-content: space-between; align-items: center; }
-    .sidebar-title { font-size: 13px; font-weight: 600; }
-    .actions-group { display: flex; gap: 4px; }
+    .sidebar-title { font-size: 13px; font-weight: 600; color: #475569; }
+    .actions-group { display: flex; gap: 6px; }
     .icon-btn {
-      width: 26px; height: 26px; border-radius: 4px; border: none;
-      background: #22c55e; color: #fff; cursor: pointer; font-size: 12px;
+      padding: 4px 8px; border-radius: 4px; border: none;
+      background: #2563eb; color: #fff; cursor: pointer; font-size: 12px; font-weight: 500;
     }
     .icon-btn.folder { background: #f59e0b; }
     
-    .search-box { padding: 0 12px 12px; }
-    .search-input { width: 100%; padding: 5px 8px; font-size: 12px; border: 1px solid #e2e8f0; border-radius: 4px; outline: none; }
+    .search-box { padding: 0 12px 10px; }
+    .search-input { width: 100%; padding: 6px 10px; font-size: 12px; border: 1px solid #cbd5e1; border-radius: 4px; outline: none; }
     
-    /* 树状结构样式 */
-    .file-tree { flex: 1; overflow-y: auto; padding: 0 4px; user-select: none; }
+    /* 树状菜单与操作项 */
+    .file-tree { flex: 1; overflow-y: auto; padding: 4px; user-select: none; }
+    .tree-node-wrapper { position: relative; }
     .tree-node {
       display: flex; align-items: center; justify-content: space-between;
-      padding: 6px 8px; border-radius: 4px; font-size: 13px; cursor: pointer;
-      margin-bottom: 2px;
+      padding: 6px 8px; border-radius: 6px; font-size: 13px; cursor: pointer;
+      margin-bottom: 2px; color: #334155;
     }
     .tree-node:hover { background: #f1f5f9; }
-    .tree-node.active { background: #e0f2fe; color: #0284c7; font-weight: 500; }
-    .node-info { display: flex; align-items: center; gap: 6px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .tree-node.active { background: #eff6ff; color: #2563eb; font-weight: 500; }
+    .node-info { display: flex; align-items: center; gap: 6px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; }
     .arrow { display: inline-block; width: 12px; font-size: 10px; color: #94a3b8; transition: transform 0.2s; }
     .arrow.open { transform: rotate(90deg); }
 
-    /* 工作区 */
-    .content-area { flex: 1; display: flex; flex-direction: column; background: #f8fafc; overflow-y: auto; }
-    .editor-container { display: none; flex-direction: column; height: 100%; padding: 16px; gap: 12px; }
-    .top-bar { display: flex; justify-content: space-between; align-items: center; }
-    .btn-save { background: #2563eb; color: #fff; border: none; padding: 6px 16px; border-radius: 4px; cursor: pointer; font-weight: 500; }
-    .font-control { font-size: 12px; color: #64748b; display: flex; align-items: center; gap: 8px; }
-    .font-btn { padding: 2px 6px; border: 1px solid #cbd5e1; background: #fff; border-radius: 3px; cursor: pointer; }
-    
-    .editor-textarea {
-      flex: 1; width: 100%; min-height: 240px; padding: 12px; border: 1px solid #e2e8f0;
-      border-radius: 6px; outline: none; font-family: monospace; font-size: 14px; line-height: 1.6; resize: vertical;
+    /* 文件菜单按键 */
+    .more-btn {
+      display: none; padding: 2px 6px; border-radius: 4px; border: none; background: transparent;
+      color: #64748b; font-weight: bold; cursor: pointer; font-size: 14px;
     }
-    .stats-bar { text-align: right; font-size: 12px; color: #94a3b8; }
+    .tree-node:hover .more-btn { display: inline-block; }
+    .more-btn:hover { background: #e2e8f0; color: #0f172a; }
 
-    /* 分享卡片 */
-    .share-section { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 16px; margin-top: 10px; }
-    .share-header { font-size: 14px; font-weight: 600; color: #334155; margin-bottom: 8px; }
-    .share-tips { font-size: 12px; color: #94a3b8; margin-bottom: 12px; }
-    .token-row { display: flex; gap: 12px; margin-bottom: 12px; }
-    .token-input { flex: 1; padding: 8px 12px; font-size: 13px; border: 1px solid #cbd5e1; border-radius: 4px; outline: none; }
-    .btn-action { background: #2563eb; color: #fff; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-size: 13px; }
+    /* 下拉菜单 */
+    .dropdown-menu {
+      position: absolute; right: 8px; top: 28px; z-index: 100;
+      background: #fff; border: 1px solid #e2e8f0; border-radius: 6px;
+      box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); width: 140px; padding: 4px 0; display: none;
+    }
+    .dropdown-item {
+      padding: 6px 12px; font-size: 12px; color: #334155; cursor: pointer; display: flex; align-items: center; justify-content: space-between;
+    }
+    .dropdown-item:hover { background: #f8fafc; color: #2563eb; }
+    .dropdown-item.danger:hover { background: #fef2f2; color: #ef4444; }
 
-    .share-result { display: none; background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 6px; padding: 12px; margin-top: 10px; }
-    .result-title { font-size: 13px; color: #166534; font-weight: 500; margin-bottom: 8px; display: flex; justify-content: space-between; }
-    .link-input { width: 100%; padding: 8px; font-size: 13px; border: 1px solid #86efac; border-radius: 4px; color: #15803d; background: #fff; font-family: monospace; }
-    .qr-container { margin-top: 16px; display: flex; justify-content: center; }
+    /* 编辑器工作区 */
+    .content-area { flex: 1; display: flex; flex-direction: column; background: #fff; overflow-y: auto; }
+    .editor-container { display: none; flex-direction: column; height: 100%; padding: 16px 24px; gap: 12px; }
+    
+    .top-bar { display: flex; justify-content: space-between; align-items: center; padding-bottom: 8px; border-bottom: 1px solid #f1f5f9; }
+    .save-status { font-size: 12px; color: #10b981; font-weight: 500; display: flex; align-items: center; gap: 4px; }
+    .save-status.saving { color: #f59e0b; }
+    
+    .controls-group { display: flex; align-items: center; gap: 12px; font-size: 12px; color: #64748b; }
+    .select-control { padding: 3px 6px; font-size: 12px; border: 1px solid #cbd5e1; border-radius: 4px; outline: none; background: #fff; }
+    .font-btn { padding: 2px 8px; border: 1px solid #cbd5e1; background: #fff; border-radius: 4px; cursor: pointer; }
+
+    /* 编辑器输入框样式强化 */
+    .editor-textarea {
+      flex: 1; width: 100%; min-height: 350px; padding: 16px; border: 1px solid #e2e8f0;
+      border-radius: 8px; outline: none; font-size: 14px; line-height: 1.7; letter-spacing: 0.2px;
+      resize: none; background: #fafafa; color: #0f172a;
+      box-shadow: inset 0 1px 2px rgba(0,0,0,0.03);
+      transition: border-color 0.2s, background-color 0.2s;
+    }
+    .editor-textarea:focus { border-color: #3b82f6; background: #fff; }
+    
+    /* 字体样式类 */
+    .font-mono { font-family: "Consolas", "Fira Code", "Courier New", monospace; }
+    .font-sans { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    .font-serif { font-family: "Georgia", "Songti SC", "SimSun", serif; }
+
+    .stats-bar { text-align: right; font-size: 12px; color: #94a3b8; padding-top: 4px; }
+
+    /* 分享卡片（带有右上角关闭按钮） */
+    .share-section { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px; margin-top: 8px; }
+    .share-header { font-size: 13px; font-weight: 600; color: #334155; margin-bottom: 6px; }
+    .share-tips { font-size: 11px; color: #94a3b8; margin-bottom: 12px; }
+    .token-row { display: flex; gap: 8px; }
+    .token-input { flex: 1; padding: 6px 10px; font-size: 12px; border: 1px solid #cbd5e1; border-radius: 4px; outline: none; }
+    .btn-action { background: #2563eb; color: #fff; border: none; padding: 6px 14px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: 500; }
+
+    .share-result {
+      position: relative; display: none; background: #f0fdf4; border: 1px solid #bbf7d0;
+      border-radius: 8px; padding: 14px; margin-top: 12px;
+    }
+    .close-share-btn {
+      position: absolute; right: 12px; top: 10px; border: none; background: transparent;
+      font-size: 16px; color: #166534; cursor: pointer; font-weight: bold; padding: 2px 6px;
+    }
+    .close-share-btn:hover { color: #ef4444; }
+    .result-title { font-size: 12px; color: #166534; font-weight: 600; margin-bottom: 8px; }
+    .link-input { width: 100%; padding: 8px; font-size: 12px; border: 1px solid #86efac; border-radius: 4px; color: #15803d; background: #fff; font-family: monospace; }
+    .qr-container { margin-top: 12px; display: flex; justify-content: center; }
 
     .empty-state { margin: auto; text-align: center; color: #64748b; }
 
@@ -92,22 +138,38 @@
       display: flex; justify-content: center; align-items: center; z-index: 999;
     }
     .login-card {
-      background: #fff; padding: 24px; border-radius: 8px; width: 320px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.1); text-align: center;
+      background: #fff; padding: 28px; border-radius: 12px; width: 340px;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); text-align: left;
     }
-    .login-title { font-size: 16px; font-weight: 600; margin-bottom: 16px; color: #0f172a; }
-    .login-input { width: 100%; padding: 8px 12px; font-size: 14px; border: 1px solid #cbd5e1; border-radius: 4px; margin-bottom: 16px; outline: none; }
-    .login-btn { width: 100%; padding: 8px; background: #2563eb; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 500; }
+    .login-title { font-size: 16px; font-weight: 600; margin-bottom: 16px; color: #0f172a; text-align: center; }
+    .form-group { margin-bottom: 14px; }
+    .form-label { font-size: 12px; color: #64748b; display: block; margin-bottom: 4px; }
+    .login-input, .login-select {
+      width: 100%; padding: 8px 12px; font-size: 13px; border: 1px solid #cbd5e1; border-radius: 6px; outline: none;
+    }
+    .login-btn { width: 100%; padding: 10px; background: #2563eb; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 500; font-size: 14px; margin-top: 8px; }
   </style>
 </head>
 <body>
 
-  <!-- 🔒 密码验证弹窗 -->
+  <!-- 🔒 密码验证弹窗（包含保活时间选项） -->
   <div class="login-mask" id="loginMask">
     <div class="login-card">
-      <div class="login-title">🔐 身份验证</div>
-      <input type="password" id="passwordInput" class="login-input" placeholder="请输入管理密码" onkeyup="if(event.key==='Enter') login()">
-      <button class="login-btn" onclick="login()">进入系统</button>
+      <div class="login-title">🔐 密码身份验证</div>
+      <div class="form-group">
+        <label class="form-label">管理密码</label>
+        <input type="password" id="passwordInput" class="login-input" placeholder="请输入密码" onkeyup="if(event.key==='Enter') login()">
+      </div>
+      <div class="form-group">
+        <label class="form-label">登录保活时间</label>
+        <select id="keepAliveSelect" class="login-select">
+          <option value="3600000">1 小时</option>
+          <option value="86400000" selected>1 天</option>
+          <option value="2592000000">1 个月 (30天)</option>
+          <option value="31536000000">1 年</option>
+        </select>
+      </div>
+      <button class="login-btn" onclick="login()">登 录</button>
     </div>
   </div>
 
@@ -119,21 +181,21 @@
   <div class="main-container">
     <div class="sidebar">
       <div class="sidebar-header">
-        <span class="sidebar-title">📁 文件管理</span>
+        <span class="sidebar-title">📁 文件清单</span>
         <div class="actions-group">
-          <button class="icon-btn" title="新建文件" onclick="createNewItem('file')">📄⁺</button>
+          <button class="icon-btn" title="新建文件" onclick="createNewItem('file')">📄 新建文件</button>
           <button class="icon-btn folder" title="新建文件夹" onclick="createNewItem('folder')">📁⁺</button>
         </div>
       </div>
       <div class="search-box">
         <input type="text" id="searchInput" class="search-input" placeholder="搜索文件..." oninput="renderTree()">
       </div>
-      <div class="file-tree" id="fileTree"></div>
+      <div class="file-tree" id="fileTree" onclick="closeAllDropdowns()"></div>
     </div>
 
     <div class="content-area">
       <div class="empty-state" id="emptyState">
-        <p style="font-size:18px; font-weight:bold; margin-bottom:8px;">选择或新建文件开始编辑</p>
+        <p style="font-size:16px; font-weight:600; margin-bottom:12px; color:#475569;">选择或新建文件开始编辑</p>
         <div style="display:flex; gap:10px; justify-content:center;">
           <button class="btn-action" onclick="createNewItem('file')">📄 新建文件</button>
           <button class="btn-action" style="background:#f59e0b;" onclick="createNewItem('folder')">📁 新建文件夹</button>
@@ -142,35 +204,39 @@
 
       <div class="editor-container" id="editorContainer">
         <div class="top-bar">
-          <button class="btn-save" onclick="saveCurrentFile()">💾 保存</button>
-          <div class="font-control">
-            字号
+          <div class="save-status" id="saveStatus">✓ 已自动保存</div>
+          <div class="controls-group">
+            <span>字体:</span>
+            <select id="fontSelect" class="select-control" onchange="changeFontFamily(this.value)">
+              <option value="font-mono" selected>等宽代码体</option>
+              <option value="font-sans">无衬线字体</option>
+              <option value="font-serif">衬线/宋体</option>
+            </select>
+            
+            <span>字号:</span>
             <button class="font-btn" onclick="changeFontSize(-1)">-</button>
             <span id="fontSizeDisplay">14</span>
             <button class="font-btn" onclick="changeFontSize(1)">+</button>
-            <span style="margin-left:12px;">当前: <strong id="currentFileName">未命名</strong></span>
           </div>
         </div>
 
-        <textarea id="textEditor" class="editor-textarea" oninput="updateStats()"></textarea>
+        <textarea id="textEditor" class="editor-textarea font-mono" oninput="handleEditorInput()"></textarea>
         <div class="stats-bar" id="statsBar">0 字 · 0 行</div>
 
         <div class="share-section">
           <div class="share-header">🔑 分享设置</div>
-          <div class="share-tips">Token 永久有效，可随时重新生成 Token 替换旧链接使之失效。</div>
+          <div class="share-tips">自定义 Token 替代公开 URL，可随时重新生成使旧链接失效。</div>
           
           <div class="token-row">
-            <input type="text" id="tokenInput" class="token-input" placeholder="自定义 Token（留空则自动生成 UUID）">
-            <button class="btn-action" onclick="generateShareLink()">生成 / 更新</button>
+            <input type="text" id="tokenInput" class="token-input" placeholder="自定义 Token（留空自动生成）">
+            <button class="btn-action" onclick="generateShareLink()">生成 / 更新链接</button>
           </div>
 
+          <!-- 分享卡片结果（带关闭按钮） -->
           <div class="share-result" id="shareResult">
-            <div class="result-title">
-              <span>✓ 分享链接已生成</span>
-              <span style="color:#ef4444; cursor:pointer;" onclick="hideShareResult()">撤销</span>
-            </div>
+            <button class="close-share-btn" title="关闭" onclick="hideShareResult()">×</button>
+            <div class="result-title">✓ 订阅/纯文本分享链接</div>
             <input type="text" id="shareUrlInput" class="link-input" readonly onclick="this.select(); document.execCommand('copy'); alert('链接已复制到剪贴板！');">
-            <p style="font-size:11px; color:#15803d; margin-top:4px;">点击链接框即可复制</p>
             <div class="qr-container" id="qrcode"></div>
           </div>
         </div>
@@ -187,29 +253,49 @@
     let selectedParentFolderId = null;
     let openFolderIds = new Set();
     let currentFontSize = 14;
+    let autoSaveTimer = null;
 
+    // 1. 验证保活状态与获取密码
     function getStoredPassword() {
-      return localStorage.getItem('admin_pwd') || '';
+      const authData = localStorage.getItem('admin_auth');
+      if (!authData) return null;
+      try {
+        const { pwd, expire } = JSON.parse(authData);
+        if (Date.now() > expire) {
+          localStorage.removeItem('admin_auth');
+          return null;
+        }
+        return pwd;
+      } catch (e) {
+        return null;
+      }
     }
 
-    // 封装 API 请求，统一附带密码 Header
     async function apiFetch(endpoint, options = {}) {
+      const pwd = getStoredPassword();
+      if (!pwd) {
+        document.getElementById('loginMask').style.display = 'flex';
+        throw new Error('未登录或登录超时');
+      }
+
       const headers = {
         'Content-Type': 'application/json',
-        'X-Admin-Password': getStoredPassword(),
+        'X-Admin-Password': pwd,
         ...(options.headers || {})
       };
 
       const res = await fetch(`${API_BASE}${endpoint}`, { ...options, headers });
       if (res.status === 401) {
+        localStorage.removeItem('admin_auth');
         document.getElementById('loginMask').style.display = 'flex';
-        throw new Error('密码校验失败');
+        throw new Error('密码错误');
       }
       return res;
     }
 
     async function login() {
       const pwd = document.getElementById('passwordInput').value.trim();
+      const keepAliveMs = parseInt(document.getElementById('keepAliveSelect').value);
       if (!pwd) return alert('请输入密码');
 
       try {
@@ -219,19 +305,20 @@
         });
 
         if (res.ok) {
-          localStorage.setItem('admin_pwd', pwd);
+          const authData = { pwd, expire: Date.now() + keepAliveMs };
+          localStorage.setItem('admin_auth', JSON.stringify(authData));
           document.getElementById('loginMask').style.display = 'none';
           fetchItems();
         } else {
           alert('密码错误！');
         }
       } catch (e) {
-        alert('登录异常: ' + e.message);
+        alert('登录失败: ' + e.message);
       }
     }
 
     function logout() {
-      localStorage.removeItem('admin_pwd');
+      localStorage.removeItem('admin_auth');
       location.reload();
     }
 
@@ -241,10 +328,11 @@
         items = await res.json();
         renderTree();
       } catch (err) {
-        console.error("加载列表失败", err);
+        console.error("无法加载文件", err);
       }
     }
 
+    // 2. 渲染树形菜单与快捷菜单
     function renderTree() {
       const treeEl = document.getElementById('fileTree');
       const keyword = document.getElementById('searchInput').value.toLowerCase();
@@ -252,7 +340,7 @@
 
       if (keyword) {
         items.filter(i => i.name.toLowerCase().includes(keyword)).forEach(item => {
-          treeEl.appendChild(createNodeElement(item, 0));
+          treeEl.appendChild(createNodeWrapper(item, 0));
         });
         return;
       }
@@ -263,8 +351,8 @@
     function renderNodes(parentId, level, container) {
       const children = items.filter(i => i.parentId === parentId);
       children.forEach(item => {
-        const nodeEl = createNodeElement(item, level);
-        container.appendChild(nodeEl);
+        const nodeWrapper = createNodeWrapper(item, level);
+        container.appendChild(nodeWrapper);
 
         if (item.type === 'folder' && openFolderIds.has(item.id)) {
           renderNodes(item.id, level + 1, container);
@@ -272,30 +360,46 @@
       });
     }
 
-    function createNodeElement(item, level) {
-      const el = document.createElement('div');
-      el.className = `tree-node ${activeItemId === item.id ? 'active' : ''}`;
-      el.style.paddingLeft = `${level * 16 + 8}px`;
+    function createNodeWrapper(item, level) {
+      const wrapper = document.createElement('div');
+      wrapper.className = 'tree-node-wrapper';
 
       const isFolder = item.type === 'folder';
       const isOpen = openFolderIds.has(item.id);
+
+      const el = document.createElement('div');
+      el.className = `tree-node ${activeItemId === item.id ? 'active' : ''}`;
+      el.style.paddingLeft = `${level * 16 + 8}px`;
 
       el.innerHTML = `
         <div class="node-info">
           ${isFolder ? `<span class="arrow ${isOpen ? 'open' : ''}">▶</span>📁` : '📄'}
           <span>${item.name}</span>
         </div>
-        <span onclick="deleteItem(event, '${item.id}')" style="color:#ef4444; padding:0 4px;">✕</span>
+        <button class="more-btn" onclick="toggleDropdown(event, '${item.id}')">⋮</button>
       `;
+
+      // 下拉菜单结构
+      const menu = document.createElement('div');
+      menu.className = 'dropdown-menu';
+      menu.id = `dropdown-${item.id}`;
+      
+      let menuContent = '';
+      if (!isFolder) {
+        menuContent += `<div class="dropdown-item" onclick="viewShareLink(event, '${item.id}')">🔗 查看分享链接</div>`;
+      }
+      menuContent += `
+        <div class="dropdown-item" onclick="moveItem(event, '${item.id}')">📂 移动到...</div>
+        <div class="dropdown-item" onclick="renameItem(event, '${item.id}')">✏️ 重命名</div>
+        <div class="dropdown-item danger" onclick="deleteItem(event, '${item.id}')">🗑️ 删除</div>
+      `;
+      menu.innerHTML = menuContent;
 
       el.onclick = (e) => {
         e.stopPropagation();
+        closeAllDropdowns();
         if (isFolder) {
-          if (openFolderIds.has(item.id)) {
-            openFolderIds.delete(item.id);
-          } else {
-            openFolderIds.add(item.id);
-          }
+          isOpen ? openFolderIds.delete(item.id) : openFolderIds.add(item.id);
           selectedParentFolderId = item.id;
           renderTree();
         } else {
@@ -303,9 +407,23 @@
         }
       };
 
-      return el;
+      wrapper.appendChild(el);
+      wrapper.appendChild(menu);
+      return wrapper;
     }
 
+    function toggleDropdown(e, id) {
+      e.stopPropagation();
+      closeAllDropdowns();
+      const menu = document.getElementById(`dropdown-${id}`);
+      if (menu) menu.style.display = 'block';
+    }
+
+    function closeAllDropdowns() {
+      document.querySelectorAll('.dropdown-menu').forEach(m => m.style.display = 'none');
+    }
+
+    // 3. 文件增删改查与操作
     async function selectFile(id) {
       activeItemId = id;
       const file = items.find(i => i.id === id);
@@ -314,40 +432,26 @@
       selectedParentFolderId = file.parentId;
       document.getElementById('emptyState').style.display = 'none';
       document.getElementById('editorContainer').style.display = 'flex';
-      document.getElementById('currentFileName').textContent = file.name;
       document.getElementById('tokenInput').value = file.token || '';
 
-      // 获取文本内容（/sub 接口是公开的）
       const res = await fetch(`${API_BASE}/sub/${file.token}/${encodeURIComponent(file.name)}`);
-      if (res.ok) {
-        document.getElementById('textEditor').value = await res.text();
-      } else {
-        document.getElementById('textEditor').value = '';
-      }
+      document.getElementById('textEditor').value = res.ok ? await res.text() : '';
 
       updateStats();
       if (file.token) {
         showShareResult(file.token);
       } else {
-        document.getElementById('shareResult').style.display = 'none';
+        hideShareResult();
       }
       renderTree();
     }
 
     async function createNewItem(type) {
       const label = type === 'folder' ? '文件夹' : '文件';
-      const name = prompt(`请输入${label}名称:`, `新建${label}-${Date.now().toString().slice(-4)}`);
+      const name = prompt(`请输入${label}名称:`, `新建${label}`);
       if (!name) return;
 
-      const newItem = {
-        id: Date.now().toString(),
-        name,
-        type,
-        parentId: selectedParentFolderId,
-        token: "",
-        content: ""
-      };
-
+      const newItem = { id: Date.now().toString(), name, type, parentId: selectedParentFolderId, token: "", content: "" };
       items.push(newItem);
       await saveItemToBackend(newItem);
 
@@ -359,13 +463,104 @@
       }
     }
 
-    async function saveCurrentFile() {
+    async function renameItem(e, id) {
+      e.stopPropagation();
+      closeAllDropdowns();
+      const item = items.find(i => i.id === id);
+      if (!item) return;
+
+      const newName = prompt('请输入新名称:', item.name);
+      if (newName && newName !== item.name) {
+        item.name = newName;
+        await saveItemToBackend(item);
+        renderTree();
+      }
+    }
+
+    async function moveItem(e, id) {
+      e.stopPropagation();
+      closeAllDropdowns();
+      const item = items.find(i => i.id === id);
+      if (!item) return;
+
+      const folders = items.filter(i => i.type === 'folder' && i.id !== id);
+      let targetOptions = "0: [根目录]\n";
+      folders.forEach((f, index) => { targetOptions += `${index + 1}: ${f.name}\n`; });
+
+      const choice = prompt(`请选择移动到的目标位置编号:\n${targetOptions}`, "0");
+      if (choice === null) return;
+
+      const num = parseInt(choice);
+      if (num === 0) {
+        item.parentId = null;
+      } else if (num > 0 && num <= folders.length) {
+        item.parentId = folders[num - 1].id;
+      } else {
+        return alert('无效选项');
+      }
+
+      await saveItemToBackend(item);
+      renderTree();
+    }
+
+    function viewShareLink(e, id) {
+      e.stopPropagation();
+      closeAllDropdowns();
+      selectFile(id);
+    }
+
+    async function deleteItem(e, id) {
+      e.stopPropagation();
+      closeAllDropdowns();
+      const target = items.find(i => i.id === id);
+      if (!target) return;
+
+      if (confirm(`确认删除 ${target.name} 吗？`)) {
+        const idsToDelete = [id];
+        if (target.type === 'folder') {
+          const findChildren = (pid) => {
+            items.filter(i => i.parentId === pid).forEach(child => {
+              idsToDelete.push(child.id);
+              if (child.type === 'folder') findChildren(child.id);
+            });
+          };
+          findChildren(id);
+        }
+
+        for (const delId of idsToDelete) {
+          await apiFetch(`/api/files/${delId}`, { method: 'DELETE' });
+        }
+
+        items = items.filter(i => !idsToDelete.includes(i.id));
+        if (idsToDelete.includes(activeItemId)) {
+          activeItemId = null;
+          document.getElementById('emptyState').style.display = 'flex';
+          document.getElementById('editorContainer').style.display = 'none';
+        }
+        renderTree();
+      }
+    }
+
+    // 4. 实时自动保存（防抖节流）
+    function handleEditorInput() {
+      updateStats();
+      const statusEl = document.getElementById('saveStatus');
+      statusEl.textContent = '⏳ 保存中...';
+      statusEl.className = 'save-status saving';
+
+      clearTimeout(autoSaveTimer);
+      autoSaveTimer = setTimeout(async () => {
+        await saveCurrentFileSilently();
+        statusEl.textContent = '✓ 已自动保存';
+        statusEl.className = 'save-status';
+      }, 1000);
+    }
+
+    async function saveCurrentFileSilently() {
       const file = items.find(i => i.id === activeItemId);
       if (!file) return;
-
       file.content = document.getElementById('textEditor').value;
       await saveItemToBackend(file);
-      alert('保存成功！');
     }
 
     async function saveItemToBackend(item) {
@@ -375,15 +570,13 @@
       });
     }
 
+    // 5. 分享逻辑与排版控制
     async function generateShareLink() {
       const file = items.find(i => i.id === activeItemId);
       if (!file || file.type !== 'file') return;
 
-      let token = document.getElementById('tokenInput').value.trim();
-      if (!token) {
-        token = crypto.randomUUID();
-        document.getElementById('tokenInput').value = token;
-      }
+      let token = document.getElementById('tokenInput').value.trim() || crypto.randomUUID();
+      document.getElementById('tokenInput').value = token;
 
       file.token = token;
       file.content = document.getElementById('textEditor').value;
@@ -408,42 +601,6 @@
       document.getElementById('shareResult').style.display = 'none';
     }
 
-    async function deleteItem(e, id) {
-      e.stopPropagation();
-      const target = items.find(i => i.id === id);
-      if (!target) return;
-
-      const isFolder = target.type === 'folder';
-      const msg = isFolder ? '确认删除该文件夹及其内部所有内容吗？' : '确认删除该文件吗？';
-
-      if (confirm(msg)) {
-        const idsToDelete = [id];
-        if (isFolder) {
-          const findChildren = (pid) => {
-            items.filter(i => i.parentId === pid).forEach(child => {
-              idsToDelete.push(child.id);
-              if (child.type === 'folder') findChildren(child.id);
-            });
-          };
-          findChildren(id);
-        }
-
-        for (const deleteId of idsToDelete) {
-          await apiFetch(`/api/files/${deleteId}`, { method: 'DELETE' });
-        }
-
-        items = items.filter(i => !idsToDelete.includes(i.id));
-
-        if (idsToDelete.includes(activeItemId)) {
-          activeItemId = null;
-          document.getElementById('emptyState').style.display = 'flex';
-          document.getElementById('editorContainer').style.display = 'none';
-        }
-
-        renderTree();
-      }
-    }
-
     function updateStats() {
       const text = document.getElementById('textEditor').value;
       document.getElementById('statsBar').textContent = `${text.length} 字 · ${text ? text.split('\n').length : 1} 行`;
@@ -455,7 +612,12 @@
       document.getElementById('textEditor').style.fontSize = `${currentFontSize}px`;
     }
 
-    // 页面加载时自动检查是否有密码
+    function changeFontFamily(fontClass) {
+      const editor = document.getElementById('textEditor');
+      editor.className = `editor-textarea ${fontClass}`;
+    }
+
+    // 页面开启检查
     if (getStoredPassword()) {
       document.getElementById('loginMask').style.display = 'none';
       fetchItems();
